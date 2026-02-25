@@ -6,478 +6,427 @@ public class SnakeController : MonoBehaviour
 {
     // 游戏状态枚举
     private enum GameState { Start, Playing, GameOver }
-    
+
     // 当前游戏状态
-    private GameState currentState = GameState.Start;
-    
-    // 蛇的移动速度
-    public float moveSpeed = 1.0f;
-    
-    // 移动方向
-    private Vector3 direction = Vector3.right;
-    
-    // 蛇身的游戏对象列表
-    private List<GameObject> bodyParts = new List<GameObject>();
-    
+    private GameState _currentState = GameState.Start;
+
+    [SerializeField]
+    private GameSettingScriptableObject _gameSetting;
+
+    [SerializeField]
     // 蛇头的引用
-    public GameObject head;
-    
-    // 移动计时器
-    private float moveTimer = 0.0f;
-    
-    // 移动间隔
-    private float moveInterval = 0.2f;
-    
-    // 游戏是否结束
-    private bool gameOver = false;
-    
-    // 得分
-    private int score = 0;
-    
-    // 得分文本的引用
-    public UnityEngine.UI.Text scoreText;
-    
-    // 开始按钮的引用
-    public UnityEngine.UI.Button startButton;
-    
-    // 游戏结束文本的引用
-    public UnityEngine.UI.Text gameOverText;
-    
-    // 食物的引用
-    private GameObject food;
-    
-    // 游戏区域的边界
-    private float boundary = 4.5f;
-    
+    private GameObject _head;
+
+    [SerializeField]
+    // 蛇身的游戏对象列表
+    private List<GameObject> _bodyParts = new List<GameObject>();
+
+    [SerializeField]
     // 输入系统
-    private PlayerInput playerInput;
-    private InputAction moveUpAction;
-    private InputAction moveDownAction;
-    private InputAction moveLeftAction;
-    private InputAction moveRightAction;
-    
+    private InputActionProperty _moveInputActionProperty;
+
+    [SerializeField]
+    // 食物管理器
+    private FoodManager _foodManager;
+
+    [SerializeField]
+    // UI管理器
+    private UIManager _uiManager;
+
+    // 游戏区域的边界
+    private float _boundary = 4.5f;
+
+    // 蛇身的预制体
+    private GameObject _bodyPrefab;
+
+    // 移动计时器
+    private float _moveTimer = 0.0f;
+
+    // 移动间隔
+    private float _moveInterval = 0.2f;
+
+    // 蛇的移动速度
+    private float _moveSpeed = 1.0f;
+
+    // 移动方向
+    private Vector3 _direction = Vector3.right;
+
+    // 游戏是否结束
+    private bool _gameOver = false;
+
+    // 得分
+    private int _score = 0;
+
+    // 身体大小缩放系数
+    private float _bodyScaleFactor = 0.8f;
+
+    private void Awake()
+    {
+        if (_gameSetting == null)
+        {
+            _gameSetting = Resources.Load<GameSettingScriptableObject>("GameSettings/DefaultGameSetting");
+        }
+        
+        if (_gameSetting != null)
+        {
+            _bodyPrefab = _gameSetting.bodyPrefab;
+            _boundary = _gameSetting.boundary;
+            _moveSpeed = _gameSetting.moveSpeed;
+            _moveInterval = _gameSetting.moveInterval;
+            _bodyScaleFactor = _gameSetting.bodyScaleFactor;
+        }
+    }
+
     void Start()
     {
-        // 自动查找head对象
-        head = transform.Find("Head").gameObject;
-        
         // 初始化蛇身列表，添加初始的身体段
         foreach (Transform child in transform)
         {
             if (child.name != "Head")
             {
-                bodyParts.Add(child.gameObject);
+                _bodyParts.Add(child.gameObject);
             }
         }
-        
-        // 查找得分文本对象
-        GameObject scoreTextObj = GameObject.Find("ScoreText");
-        if (scoreTextObj != null)
-        {
-            scoreText = scoreTextObj.GetComponent<UnityEngine.UI.Text>();
-        }
-        
-        // 查找开始按钮对象
-        GameObject startButtonObj = GameObject.Find("StartButton");
-        if (startButtonObj != null)
-        {
-            startButton = startButtonObj.GetComponent<UnityEngine.UI.Button>();
-            if (startButton != null)
-            {
-                startButton.onClick.AddListener(StartGame);
-            }
-        }
-        
-        // 创建游戏结束文本对象
-        GameObject gameOverTextObj = new GameObject("GameOverText");
-        gameOverTextObj.transform.SetParent(GameObject.Find("Canvas").transform);
-        gameOverTextObj.transform.localPosition = new Vector3(0, 100, 0);
-        gameOverText = gameOverTextObj.AddComponent<UnityEngine.UI.Text>();
-        gameOverText.text = "Game Over!\nScore: 0\nClick Start to play again.";
-        gameOverText.alignment = TextAnchor.MiddleCenter;
-        gameOverText.gameObject.SetActive(false);
-        
-        // 初始化输入系统
-        playerInput = GetComponent<PlayerInput>();
-        if (playerInput == null)
-        {
-            playerInput = gameObject.AddComponent<PlayerInput>();
-        }
-        
-        // 创建输入动作
-        moveUpAction = new InputAction(binding: "<Keyboard>/w");
-        moveDownAction = new InputAction(binding: "<Keyboard>/s");
-        moveLeftAction = new InputAction(binding: "<Keyboard>/a");
-        moveRightAction = new InputAction(binding: "<Keyboard>/d");
-        
+
         // 启用输入动作
-        moveUpAction.Enable();
-        moveDownAction.Enable();
-        moveLeftAction.Enable();
-        moveRightAction.Enable();
-        
-        // 设置输入动作的回调
-        moveUpAction.performed += ctx => OnMoveUp();
-        moveDownAction.performed += ctx => OnMoveDown();
-        moveLeftAction.performed += ctx => OnMoveLeft();
-        moveRightAction.performed += ctx => OnMoveRight();
-        
+        _moveInputActionProperty.action.Enable();
+
+        // 初始化管理器
+        _foodManager.Initialize(_head, _bodyParts);
+        _uiManager.Initialize();
+        _uiManager.GetStartButton().onClick.AddListener(StartGame);
+
         // 更新初始得分显示
-        UpdateScoreDisplay();
-        
+        _uiManager.SetScore(_score);
+
         // 设置游戏状态为Start
         SetGameState(GameState.Start);
+
+        // 初始调整身体大小
+        AdjustBodySizes();
     }
-    
-    // 移动向上
-    void OnMoveUp()
-    {
-        if (currentState == GameState.Playing && direction != Vector3.down)
-        {
-            direction = Vector3.forward;
-        }
-    }
-    
-    // 移动向下
-    void OnMoveDown()
-    {
-        if (currentState == GameState.Playing && direction != Vector3.forward)
-        {
-            direction = Vector3.back;
-        }
-    }
-    
-    // 移动向左
-    void OnMoveLeft()
-    {
-        if (currentState == GameState.Playing && direction != Vector3.right)
-        {
-            direction = Vector3.left;
-        }
-    }
-    
-    // 移动向右
-    void OnMoveRight()
-    {
-        if (currentState == GameState.Playing && direction != Vector3.left)
-        {
-            direction = Vector3.right;
-        }
-    }
-    
+
     // 设置游戏状态
     void SetGameState(GameState state)
     {
-        currentState = state;
-        
+        _currentState = state;
+
         switch (state)
         {
             case GameState.Start:
                 // 显示开始按钮
-                if (startButton != null)
-                {
-                    startButton.gameObject.SetActive(true);
-                }
+                _uiManager.ShowStartButton(true);
                 // 隐藏游戏结束文本
-                if (gameOverText != null)
-                {
-                    gameOverText.gameObject.SetActive(false);
-                }
+                _uiManager.ShowGameOverText(false, 0);
                 // 暂停游戏
                 Time.timeScale = 0;
                 break;
-                
+
             case GameState.Playing:
                 // 隐藏开始按钮
-                if (startButton != null)
-                {
-                    startButton.gameObject.SetActive(false);
-                }
+                _uiManager.ShowStartButton(false);
                 // 隐藏游戏结束文本
-                if (gameOverText != null)
-                {
-                    gameOverText.gameObject.SetActive(false);
-                }
+                _uiManager.ShowGameOverText(false, 0);
                 // 开始游戏
                 Time.timeScale = 1;
                 // 生成初始食物
-                SpawnFood();
+                _foodManager.SpawnFood();
                 break;
-                
+
             case GameState.GameOver:
                 // 显示开始按钮
-                if (startButton != null)
-                {
-                    startButton.gameObject.SetActive(true);
-                }
+                _uiManager.ShowStartButton(true);
                 // 显示游戏结束文本
-                if (gameOverText != null)
-                {
-                    gameOverText.text = "Game Over!\nScore: " + score + "\nClick Start to play again.";
-                    gameOverText.gameObject.SetActive(true);
-                }
+                _uiManager.ShowGameOverText(true, _score);
                 // 暂停游戏
                 Time.timeScale = 0;
                 break;
         }
     }
-    
+
     // 开始游戏
-    void StartGame()
+    public void StartGame()
     {
         // 重置得分
-        score = 0;
-        UpdateScoreDisplay();
-        
+        _score = 0;
+        _uiManager.SetScore(_score);
+
         // 重置蛇的位置和长度
         ResetSnake();
-        
+
         // 设置游戏状态为Playing
         SetGameState(GameState.Playing);
     }
-    
+
     // 重置蛇
     void ResetSnake()
     {
         // 清除所有身体段
-        foreach (GameObject bodyPart in bodyParts)
+        foreach (GameObject bodyPart in _bodyParts)
         {
             Destroy(bodyPart);
         }
-        bodyParts.Clear();
-        
+        _bodyParts.Clear();
+
         // 重置蛇头位置
-        head.transform.localPosition = Vector3.zero;
-        
+        _head.transform.localPosition = Vector3.zero;
+
         // 重置移动方向
-        direction = Vector3.right;
-        
+        _direction = Vector3.right;
+
         // 生成初始身体段
-        GameObject body1 = Instantiate(head, transform);
+        GameObject body1;
+        if (_bodyPrefab != null)
+        {
+            body1 = Instantiate(_bodyPrefab, transform);
+        }
+        else
+        {
+            // 如果预制体未设置，使用默认从head实例化
+            body1 = Instantiate(_head, transform);
+
+            // 为身体段设置材质
+            Renderer renderer = body1.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                Material bodyMaterial = Resources.Load<Material>("Materials/BodyMaterial");
+                if (bodyMaterial != null)
+                {
+                    renderer.material = bodyMaterial;
+                }
+            }
+        }
         body1.name = "Body1";
         body1.transform.localPosition = new Vector3(-1, 0, 0);
-        
-        // 为身体段设置材质
-        Renderer renderer = body1.GetComponent<Renderer>();
-        if (renderer != null)
-        {
-            Material bodyMaterial = Resources.Load<Material>("Materials/BodyMaterial");
-            if (bodyMaterial != null)
-            {
-                renderer.material = bodyMaterial;
-            }
-        }
-        
-        bodyParts.Add(body1);
-        
+
+        _bodyParts.Add(body1);
+
+        // 更新食物管理器的身体段引用
+        _foodManager.UpdateBodyPartsReference(_bodyParts);
+
         // 清除食物
-        if (food != null)
-        {
-            Destroy(food);
-            food = null;
-        }
+        _foodManager.ClearFood();
+
+        // 调整身体大小
+        AdjustBodySizes();
     }
-    
-    // 更新得分显示
-    void UpdateScoreDisplay()
-    {
-        if (scoreText != null)
-        {
-            scoreText.text = "Score: " + score;
-        }
-    }
-    
+
     void Update()
     {
-        // 只有在游戏状态为Playing时才处理移动
-        if (currentState == GameState.Playing)
+        // 只有在游戏状态为Playing时才处理输入和移动
+        if (_currentState == GameState.Playing)
         {
+            // 处理输入
+            HandleInput();
+
             // 更新移动
-            moveTimer += Time.deltaTime;
-            if (moveTimer >= moveInterval)
+            _moveTimer += Time.deltaTime;
+            if (_moveTimer >= _moveInterval)
             {
                 Move();
-                moveTimer = 0.0f;
+                _moveTimer = 0.0f;
             }
         }
     }
-    
+
+    // 处理玩家输入
+    void HandleInput()
+    {
+        if (_moveInputActionProperty.action != null)
+        {
+            Vector2 inputValue = _moveInputActionProperty.action.ReadValue<Vector2>();
+
+            // 根据输入值更新移动方向
+            if (Mathf.Abs(inputValue.y) > Mathf.Abs(inputValue.x))
+            {
+                // 垂直输入优先
+                if (inputValue.y > 0 && _direction != Vector3.back)
+                {
+                    _direction = Vector3.forward;
+                }
+                else if (inputValue.y < 0 && _direction != Vector3.forward)
+                {
+                    _direction = Vector3.back;
+                }
+            }
+            else if (Mathf.Abs(inputValue.x) > 0)
+            {
+                // 水平输入
+                if (inputValue.x < 0 && _direction != Vector3.right)
+                {
+                    _direction = Vector3.left;
+                }
+                else if (inputValue.x > 0 && _direction != Vector3.left)
+                {
+                    _direction = Vector3.right;
+                }
+            }
+        }
+    }
+
     // 移动蛇
     void Move()
     {
         // 记录蛇头的当前位置
-        Vector3 previousPosition = head.transform.localPosition;
-        
+        Vector3 previousPosition = _head.transform.localPosition;
+
         // 移动蛇头
-        head.transform.localPosition += direction;
-        
-        // 检查边界碰撞
-        if (Mathf.Abs(head.transform.localPosition.x) > boundary || Mathf.Abs(head.transform.localPosition.z) > boundary)
-        {
-            GameOver();
-            return;
-        }
-        
+        _head.transform.localPosition += _direction;
+
         // 检查自身碰撞
-        foreach (GameObject bodyPart in bodyParts)
+        foreach (GameObject bodyPart in _bodyParts)
         {
-            if (Vector3.Distance(head.transform.localPosition, bodyPart.transform.localPosition) < 0.5f)
+            if (Vector3.Distance(_head.transform.localPosition, bodyPart.transform.localPosition) < 0.5f)
             {
                 GameOver();
                 return;
             }
         }
-        
+
+        // 移动蛇身
+        if (_bodyParts.Count > 0)
+        {
+            for (int i = 0; i < _bodyParts.Count; i++)
+            {
+                Vector3 tempPosition = _bodyParts[i].transform.localPosition;
+                _bodyParts[i].transform.localPosition = previousPosition;
+                previousPosition = tempPosition;
+            }
+        }
+
+        // 调整身体大小
+        AdjustBodySizes();
+    }
+    
+    // 碰撞检测 - 由SnakeHeadTrigger调用
+    public void HandleTriggerEnter(Collider other)
+    {
         // 检查食物碰撞
-        if (food != null && Vector3.Distance(head.transform.position, food.transform.position) < 0.5f)
+        if (other.gameObject.CompareTag(_gameSetting.foodTag))
         {
             CollectFood();
         }
         
-        // 移动蛇身
-        if (bodyParts.Count > 0)
+        // 检查边界碰撞
+        if (other.gameObject.CompareTag(_gameSetting.boundaryTag))
         {
-            for (int i = 0; i < bodyParts.Count; i++)
-            {
-                Vector3 tempPosition = bodyParts[i].transform.localPosition;
-                bodyParts[i].transform.localPosition = previousPosition;
-                previousPosition = tempPosition;
-            }
+            GameOver();
         }
-    }
-    
-    // 生成食物
-    void SpawnFood()
-    {
-        // 如果食物不存在，创建一个新的
-        if (food == null)
-        {
-            food = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            food.name = "Food";
-            food.transform.localScale = new Vector3(1, 1, 1);
-            
-            // 为食物设置FoodMaterial材质
-            Renderer renderer = food.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                Material foodMaterial = Resources.Load<Material>("Materials/FoodMaterial");
-                if (foodMaterial != null)
-                {
-                    renderer.material = foodMaterial;
-                }
-            }
-        }
-        
-        // 随机生成食物的位置
-        float x = Random.Range(-boundary, boundary);
-        float z = Random.Range(-boundary, boundary);
-        
-        // 确保食物不会生成在蛇身上
-        bool validPosition = false;
-        while (!validPosition)
-        {
-            validPosition = true;
-            
-            // 检查是否与蛇头重叠
-            if (Vector3.Distance(new Vector3(x, 0, z), head.transform.localPosition) < 0.5f)
-            {
-                validPosition = false;
-            }
-            
-            // 检查是否与蛇身重叠
-            foreach (GameObject bodyPart in bodyParts)
-            {
-                if (Vector3.Distance(new Vector3(x, 0, z), bodyPart.transform.localPosition) < 0.5f)
-                {
-                    validPosition = false;
-                    break;
-                }
-            }
-            
-            // 如果位置无效，重新生成
-            if (!validPosition)
-            {
-                x = Random.Range(-boundary, boundary);
-                z = Random.Range(-boundary, boundary);
-            }
-        }
-        
-        // 设置食物的位置
-        food.transform.position = new Vector3(x, 0.5f, z);
     }
     
     // 收集食物
     void CollectFood()
     {
         // 增加得分
-        score++;
-        Debug.Log("Score: " + score);
-        
+        _score++;
+        Debug.Log("Score: " + _score);
+
         // 更新得分显示
-        UpdateScoreDisplay();
-        
+        _uiManager.SetScore(_score);
+
         // 生成新的身体段
-        GameObject newBodyPart = Instantiate(head, transform);
-        newBodyPart.name = "Body" + (bodyParts.Count + 1);
-        
-        // 如果有身体段，将新身体段放在最后一个身体段的位置
-        if (bodyParts.Count > 0)
+        GameObject newBodyPart;
+        if (_bodyPrefab != null)
         {
-            newBodyPart.transform.localPosition = bodyParts[bodyParts.Count - 1].transform.localPosition;
+            newBodyPart = Instantiate(_bodyPrefab, transform);
+        }
+        else
+        {
+            // 如果预制体未设置，使用默认从head实例化
+            newBodyPart = Instantiate(_head, transform);
+
+            // 为新身体段设置BodyMaterial材质
+            Renderer renderer = newBodyPart.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                Material bodyMaterial = Resources.Load<Material>("Materials/BodyMaterial");
+                if (bodyMaterial != null)
+                {
+                    renderer.material = bodyMaterial;
+                }
+            }
+        }
+        newBodyPart.name = "Body" + (_bodyParts.Count + 1);
+
+        // 如果有身体段，将新身体段放在最后一个身体段的位置
+        if (_bodyParts.Count > 0)
+        {
+            newBodyPart.transform.localPosition = _bodyParts[_bodyParts.Count - 1].transform.localPosition;
         }
         else
         {
             // 如果没有身体段，将新身体段放在蛇头的位置
-            newBodyPart.transform.localPosition = head.transform.localPosition;
+            newBodyPart.transform.localPosition = _head.transform.localPosition;
         }
-        
-        // 为新身体段设置BodyMaterial材质
-        Renderer renderer = newBodyPart.GetComponent<Renderer>();
-        if (renderer != null)
+
+        _bodyParts.Add(newBodyPart);
+
+        // 更新食物管理器的身体段引用
+        _foodManager.UpdateBodyPartsReference(_bodyParts);
+
+        // 销毁当前食物并重新生成
+        _foodManager.ClearFood();
+        _foodManager.SpawnFood();
+
+        // 调整身体大小
+        AdjustBodySizes();
+    }
+
+    // 调整身体大小
+    void AdjustBodySizes()
+    {
+        int bodyCount = _bodyParts.Count;
+        if (bodyCount == 0)
+            return;
+
+        // 计算需要逐渐变小的身体段数量（最多5个）
+        int shrinkCount = Mathf.Min(5, bodyCount);
+
+        // 从头部开始往后逐渐变小
+        for (int i = 0; i < bodyCount; i++)
         {
-            Material bodyMaterial = Resources.Load<Material>("Materials/BodyMaterial");
-            if (bodyMaterial != null)
+            GameObject bodyPart = _bodyParts[i];
+            if (bodyPart != null)
             {
-                renderer.material = bodyMaterial;
+                if (i < shrinkCount)
+                {
+                    // 逐渐变小
+                    float scaleFactor;
+                    if (shrinkCount > 1)
+                    {
+                        scaleFactor = 1.0f - (i * (1.0f - _bodyScaleFactor) / (shrinkCount - 1));
+                    }
+                    else
+                    {
+                        // 避免除以零，当只有一个身体段时使用默认大小
+                        scaleFactor = 1.0f;
+                    }
+                    bodyPart.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+                }
+                else
+                {
+                    // 最小大小
+                    bodyPart.transform.localScale = new Vector3(_bodyScaleFactor, _bodyScaleFactor, _bodyScaleFactor);
+                }
             }
         }
-        
-        bodyParts.Add(newBodyPart);
-        
-        // 重新生成食物
-        SpawnFood();
     }
-    
+
     // 游戏结束
     void GameOver()
     {
-        gameOver = true;
-        Debug.Log("Game Over! Score: " + score);
+        _gameOver = true;
+        Debug.Log("Game Over! Score: " + _score);
         SetGameState(GameState.GameOver);
     }
-    
+
     // 禁用和释放输入动作
     void OnDestroy()
     {
-        if (moveUpAction != null)
+        if (_moveInputActionProperty.action != null)
         {
-            moveUpAction.Disable();
-            moveUpAction.Dispose();
-        }
-        if (moveDownAction != null)
-        {
-            moveDownAction.Disable();
-            moveDownAction.Dispose();
-        }
-        if (moveLeftAction != null)
-        {
-            moveLeftAction.Disable();
-            moveLeftAction.Dispose();
-        }
-        if (moveRightAction != null)
-        {
-            moveRightAction.Disable();
-            moveRightAction.Dispose();
+            _moveInputActionProperty.action.Disable();
+            _moveInputActionProperty.action.Dispose();
         }
     }
 }
