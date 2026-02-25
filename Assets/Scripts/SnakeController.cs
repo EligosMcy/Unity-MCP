@@ -26,8 +26,16 @@ public class SnakeController : MonoBehaviour
     private InputActionProperty _moveInputActionProperty;
 
     [SerializeField]
+    // 自动模式切换输入
+    private InputActionProperty _autoModeInputActionProperty;
+
+    [SerializeField]
     // 食物管理器
     private FoodManager _foodManager;
+
+    [SerializeField]
+    // 自动寻路组件
+    private AutoPathfinding _autoPathfinding;
 
     [SerializeField]
     // UI管理器
@@ -54,11 +62,22 @@ public class SnakeController : MonoBehaviour
     // 游戏是否结束
     private bool _gameOver = false;
 
+    // 游戏结束标志（防止重复触发）
+    private bool _isGameOverCalled = false;
+
     // 得分
     private int _score = 0;
 
     // 身体大小缩放系数
     private float _bodyScaleFactor = 0.8f;
+
+    // 自动模式标志
+    private bool _autoMode = false;
+
+    // 自动模式统计信息
+    private int _autoModeRounds = 0;
+    private List<int> _autoModeScores = new List<int>();
+    private int _autoModeHighScore = 0;
 
     private void Awake()
     {
@@ -66,7 +85,7 @@ public class SnakeController : MonoBehaviour
         {
             _gameSetting = Resources.Load<GameSettingScriptableObject>("GameSettings/DefaultGameSetting");
         }
-        
+
         if (_gameSetting != null)
         {
             _bodyPrefab = _gameSetting.bodyPrefab;
@@ -74,6 +93,12 @@ public class SnakeController : MonoBehaviour
             _moveSpeed = _gameSetting.moveSpeed;
             _moveInterval = _gameSetting.moveInterval;
             _bodyScaleFactor = _gameSetting.bodyScaleFactor;
+
+            // 更新自动寻路组件的边界值
+            if (_autoPathfinding != null)
+            {
+                _autoPathfinding.SetBoundary(_boundary);
+            }
         }
     }
 
@@ -91,10 +116,24 @@ public class SnakeController : MonoBehaviour
         // 启用输入动作
         _moveInputActionProperty.action.Enable();
 
+        // 启用自动模式输入动作
+        if (_autoModeInputActionProperty.action != null)
+        {
+            _autoModeInputActionProperty.action.Enable();
+            _autoModeInputActionProperty.action.performed += ctx => ToggleAutoMode();
+        }
+
         // 初始化管理器
         _foodManager.Initialize(_head, _bodyParts);
         _uiManager.Initialize();
         _uiManager.GetStartButton().onClick.AddListener(StartGame);
+
+        // 初始化自动寻路组件
+        if (_autoPathfinding != null)
+        {
+            _autoPathfinding.Initialize(_foodManager, this, _boundary);
+            _autoPathfinding.UpdateBodyPartsReference(_bodyParts);
+        }
 
         // 更新初始得分显示
         _uiManager.SetScore(_score);
@@ -147,6 +186,12 @@ public class SnakeController : MonoBehaviour
     // 开始游戏
     public void StartGame()
     {
+        // 重置游戏结束标志
+        _isGameOverCalled = false;
+        
+        // 取消所有挂起的 Invoke 调用
+        CancelInvoke("StartGame");
+        
         // 重置得分
         _score = 0;
         _uiManager.SetScore(_score);
@@ -204,6 +249,12 @@ public class SnakeController : MonoBehaviour
         // 更新食物管理器的身体段引用
         _foodManager.UpdateBodyPartsReference(_bodyParts);
 
+        // 更新自动寻路组件的身体段引用
+        if (_autoPathfinding != null)
+        {
+            _autoPathfinding.UpdateBodyPartsReference(_bodyParts);
+        }
+
         // 清除食物
         _foodManager.ClearFood();
 
@@ -214,10 +265,18 @@ public class SnakeController : MonoBehaviour
     void Update()
     {
         // 只有在游戏状态为Playing时才处理输入和移动
-        if (_currentState == GameState.Playing)
+        if (_currentState == GameState.Playing && !_isGameOverCalled)
         {
-            // 处理输入
-            HandleInput();
+            // 自动模式下执行寻路
+            if (_autoMode)
+            {
+                AutoPathfinding();
+            }
+            else
+            {
+                // 手动模式下处理输入
+                HandleInput();
+            }
 
             // 更新移动
             _moveTimer += Time.deltaTime;
@@ -267,6 +326,10 @@ public class SnakeController : MonoBehaviour
     // 移动蛇
     void Move()
     {
+        // 如果游戏已经结束，不执行移动
+        if (_isGameOverCalled)
+            return;
+        
         // 记录蛇头的当前位置
         Vector3 previousPosition = _head.transform.localPosition;
 
@@ -297,29 +360,32 @@ public class SnakeController : MonoBehaviour
         // 调整身体大小
         AdjustBodySizes();
     }
-    
+
     // 碰撞检测 - 由SnakeHeadTrigger调用
     public void HandleTriggerEnter(Collider other)
     {
+        // 如果游戏已经结束，不处理碰撞
+        if (_isGameOverCalled)
+            return;
+        
         // 检查食物碰撞
         if (other.gameObject.CompareTag(_gameSetting.foodTag))
         {
             CollectFood();
         }
-        
+
         // 检查边界碰撞
         if (other.gameObject.CompareTag(_gameSetting.boundaryTag))
         {
             GameOver();
         }
     }
-    
+
     // 收集食物
     void CollectFood()
     {
         // 增加得分
         _score++;
-        Debug.Log("Score: " + _score);
 
         // 更新得分显示
         _uiManager.SetScore(_score);
@@ -363,6 +429,12 @@ public class SnakeController : MonoBehaviour
 
         // 更新食物管理器的身体段引用
         _foodManager.UpdateBodyPartsReference(_bodyParts);
+
+        // 更新自动寻路组件的身体段引用
+        if (_autoPathfinding != null)
+        {
+            _autoPathfinding.UpdateBodyPartsReference(_bodyParts);
+        }
 
         // 销毁当前食物并重新生成
         _foodManager.ClearFood();
@@ -415,10 +487,70 @@ public class SnakeController : MonoBehaviour
     // 游戏结束
     void GameOver()
     {
+        // 防止重复调用 GameOver
+        if (_isGameOverCalled)
+            return;
+        
+        _isGameOverCalled = true;
         _gameOver = true;
         Debug.Log("Game Over! Score: " + _score);
+        
+        // 如果是自动模式，记录统计信息并自动重新开始
+        if (_autoMode)
+        {
+            // 记录分数
+            _autoModeScores.Add(_score);
+            _autoModeRounds++;
+            
+            // 更新最高分
+            if (_score > _autoModeHighScore)
+            {
+                _autoModeHighScore = _score;
+            }
+            
+            // 输出统计信息
+            Debug.Log("Auto Mode Round: " + _autoModeRounds);
+            Debug.Log("Current Score: " + _score);
+            Debug.Log("High Score: " + _autoModeHighScore);
+            Debug.Log("All Scores: " + string.Join(", ", _autoModeScores));
+            
+            // 延迟一段时间后自动重新开始
+            Invoke("StartGame", 1.0f);
+            return;
+        }
+        
         SetGameState(GameState.GameOver);
     }
+
+    // 切换自动模式
+    public void ToggleAutoMode()
+    {
+        _autoMode = !_autoMode;
+        _uiManager.UpdateAutoModeDisplay(_autoMode);
+        Debug.Log("Auto mode " + (_autoMode ? "enabled" : "disabled"));
+        
+        // 如果启用自动模式，重置统计信息
+        if (_autoMode)
+        {
+            _autoModeRounds = 0;
+            _autoModeScores.Clear();
+            _autoModeHighScore = 0;
+            Debug.Log("Auto mode statistics reset.");
+        }
+    }
+
+    // 自动寻路到食物
+    private void AutoPathfinding()
+    {
+        // 使用自动寻路组件计算路径
+        if (_autoPathfinding != null)
+        {
+            Vector3 headPos = _head.transform.localPosition;
+            _direction = _autoPathfinding.CalculatePath(headPos);
+        }
+    }
+
+
 
     // 禁用和释放输入动作
     void OnDestroy()
@@ -427,6 +559,12 @@ public class SnakeController : MonoBehaviour
         {
             _moveInputActionProperty.action.Disable();
             _moveInputActionProperty.action.Dispose();
+        }
+
+        if (_autoModeInputActionProperty.action != null)
+        {
+            _autoModeInputActionProperty.action.Disable();
+            _autoModeInputActionProperty.action.Dispose();
         }
     }
 }

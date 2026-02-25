@@ -37,7 +37,7 @@ public class BoundaryManager : MonoBehaviour
             return;
         }
         
-        // 边界向外扩展一格
+        // 边界位置（向外扩展0.5，确保蛇头不会直接碰到边界）
         float extendedBoundary = boundarySize + 0.5f;
         
         // Generate front boundary (Z positive)
