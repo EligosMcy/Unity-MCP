@@ -56,4 +56,15 @@ public class GameSettingScriptableObject : ScriptableObject
 
     [Tooltip("蛇身标签")]
     public string bodyTag = "Body";
+
+    [Header("动画设置")]
+    [Range(0.1f, 1.0f)]
+    [Tooltip("身体变色动画持续时间")]
+    public float colorChangeDuration = 0.2f;
+
+    [Tooltip("变色目标颜色")]
+    public Color targetColor = Color.yellow;
+
+    [Tooltip("原始身体颜色")]
+    public Color originalColor = Color.white;
 }

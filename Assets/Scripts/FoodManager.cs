@@ -238,8 +238,19 @@ public class FoodManager : MonoBehaviour
     {
         if (_bigFood != null)
         {
-            _bigFood.SetActive(false);
+            Destroy(_bigFood);
+            _bigFood = null;
         }
+    }
+
+    public GameObject GetCurrentFood()
+    {
+        return _food;
+    }
+
+    public GameObject GetCurrentBigFood()
+    {
+        return _bigFood;
     }
 
     public GameObject GetActiveFood()

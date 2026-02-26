@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using DG.Tweening;
 
 public class SnakeController : MonoBehaviour
 {
@@ -18,8 +19,8 @@ public class SnakeController : MonoBehaviour
     private GameObject _head;
 
     [SerializeField]
-    // 蛇身的游戏对象列表
-    private List<GameObject> _bodyParts = new List<GameObject>();
+    // 身体管理器
+    private SnakeBodyManager _bodyManager;
 
     [SerializeField]
     // 输入系统
@@ -44,16 +45,11 @@ public class SnakeController : MonoBehaviour
     // 游戏区域的边界
     private float _boundary = 4.5f;
 
-    // 蛇身的预制体
-    private GameObject _bodyPrefab;
-
     // 移动计时器
     private float _moveTimer = 0.0f;
 
     // 移动间隔
     private float _moveInterval = 0.2f;
-
-
 
     // 移动方向
     private Vector3 _direction = Vector3.right;
@@ -63,6 +59,8 @@ public class SnakeController : MonoBehaviour
 
     // 游戏结束标志（防止重复触发）
     private bool _isGameOverCalled = false;
+
+
 
     // 得分
     private int _score = 0;
@@ -84,7 +82,6 @@ public class SnakeController : MonoBehaviour
 
         if (_gameSetting != null)
         {
-            _bodyPrefab = _gameSetting.bodyPrefab;
             _boundary = _gameSetting.boundary;
             _moveInterval = _gameSetting.moveInterval;
 
@@ -98,13 +95,10 @@ public class SnakeController : MonoBehaviour
 
     void Start()
     {
-        // 初始化蛇身列表，添加初始的身体段
-        foreach (Transform child in transform)
+        // 初始化身体管理器
+        if (_bodyManager != null)
         {
-            if (child.name != "Head")
-            {
-                _bodyParts.Add(child.gameObject);
-            }
+            _bodyManager.Initialize(_gameSetting, _head);
         }
 
         // 启用输入动作
@@ -118,7 +112,7 @@ public class SnakeController : MonoBehaviour
         }
 
         // 初始化管理器
-        _foodManager.Initialize(_head, _bodyParts);
+        _foodManager.Initialize(_head, _bodyManager.GetBodyParts());
         _uiManager.Initialize();
         _uiManager.GetStartButton().onClick.AddListener(StartGame);
 
@@ -126,17 +120,17 @@ public class SnakeController : MonoBehaviour
         if (_autoPathfinding != null)
         {
             _autoPathfinding.Initialize(_foodManager, this, _boundary);
-            _autoPathfinding.UpdateBodyPartsReference(_bodyParts);
+            _autoPathfinding.UpdateBodyPartsReference(_bodyManager.GetBodyParts());
         }
 
         // 更新初始得分显示
         _uiManager.SetScore(_score);
 
+        // 初始化身体动画事件
+        InitializeBodyEvents();
+
         // 设置游戏状态为Start
         SetGameState(GameState.Start);
-
-        // 初始调整身体大小
-        AdjustBodySizes();
     }
 
     // 设置游戏状态
@@ -200,60 +194,29 @@ public class SnakeController : MonoBehaviour
     // 重置蛇
     void ResetSnake()
     {
-        // 清除所有身体段
-        foreach (GameObject bodyPart in _bodyParts)
-        {
-            Destroy(bodyPart);
-        }
-        _bodyParts.Clear();
-
         // 重置蛇头位置
         _head.transform.localPosition = Vector3.zero;
 
         // 重置移动方向
         _direction = Vector3.right;
 
-        // 生成初始身体段
-        GameObject body1;
-        if (_bodyPrefab != null)
+        // 重置身体
+        if (_bodyManager != null)
         {
-            body1 = Instantiate(_bodyPrefab, transform);
+            _bodyManager.ResetBody();
         }
-        else
-        {
-            // 如果预制体未设置，使用默认从head实例化
-            body1 = Instantiate(_head, transform);
-
-            // 为身体段设置材质
-            Renderer renderer = body1.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                Material bodyMaterial = Resources.Load<Material>("Materials/BodyMaterial");
-                if (bodyMaterial != null)
-                {
-                    renderer.material = bodyMaterial;
-                }
-            }
-        }
-        body1.name = "Body1";
-        body1.transform.localPosition = new Vector3(-1, 0, 0);
-
-        _bodyParts.Add(body1);
 
         // 更新食物管理器的身体段引用
-        _foodManager.UpdateBodyPartsReference(_bodyParts);
+        _foodManager.UpdateBodyPartsReference(_bodyManager.GetBodyParts());
 
         // 更新自动寻路组件的身体段引用
         if (_autoPathfinding != null)
         {
-            _autoPathfinding.UpdateBodyPartsReference(_bodyParts);
+            _autoPathfinding.UpdateBodyPartsReference(_bodyManager.GetBodyParts());
         }
 
         // 清除食物
         _foodManager.ClearFood();
-
-        // 调整身体大小
-        AdjustBodySizes();
     }
 
     void Update()
@@ -274,7 +237,7 @@ public class SnakeController : MonoBehaviour
 
             // 更新移动
             _moveTimer += Time.deltaTime;
-            if (_moveTimer >= _moveInterval)
+            if (_moveTimer >= _gameSetting.moveInterval)
             {
                 Move();
                 _moveTimer = 0.0f;
@@ -327,54 +290,96 @@ public class SnakeController : MonoBehaviour
         // 记录蛇头的当前位置
         Vector3 previousPosition = _head.transform.localPosition;
 
-        // 移动蛇头
-        _head.transform.localPosition += _direction;
+        // 计算目标位置
+        Vector3 targetPosition = _head.transform.localPosition + _direction;
 
+        // 使用 DoTween 移动蛇头
+        _head.transform.DOLocalMove(targetPosition, _moveInterval).SetEase(Ease.Linear);
+
+        // 旋转蛇头以匹配移动方向
+        RotateHead();
 
         // 移动蛇身
-        if (_bodyParts.Count > 0)
+        if (_bodyManager != null)
         {
-            for (int i = 0; i < _bodyParts.Count; i++)
+            _bodyManager.MoveBodyParts(targetPosition, previousPosition, _moveInterval);
+        }
+
+        // 检测位置碰撞（边界、身体、食物）
+        CheckPositionCollisions(targetPosition);
+    }
+
+    // 检测位置碰撞
+    void CheckPositionCollisions(Vector3 targetPosition)
+    {
+        // 检测边界碰撞
+        if (Mathf.Abs(targetPosition.x) > _boundary || Mathf.Abs(targetPosition.z) > _boundary)
+        {
+            GameOver();
+            return;
+        }
+
+        // 检测身体碰撞
+        List<GameObject> bodyParts = _bodyManager.GetBodyParts();
+        foreach (GameObject bodyPart in bodyParts)
+        {
+            if (bodyPart != null && Vector3.Distance(targetPosition, bodyPart.transform.localPosition) < 0.5f)
             {
-                Vector3 tempPosition = _bodyParts[i].transform.localPosition;
-                _bodyParts[i].transform.localPosition = previousPosition;
-                previousPosition = tempPosition;
+                GameOver();
+                return;
             }
         }
 
-        // 调整身体大小
-        AdjustBodySizes();
+        // 检测食物碰撞
+        CheckFoodCollision(targetPosition);
     }
 
-    // 碰撞检测 - 由SnakeHeadTrigger调用
-    public void HandleTriggerEnter(Collider other)
+    // 检测食物碰撞
+    void CheckFoodCollision(Vector3 snakePosition)
     {
-        // 如果游戏已经结束，不处理碰撞
-        if (_isGameOverCalled)
-            return;
-
-        // 检查小食物碰撞
-        if (other.gameObject.CompareTag(_gameSetting.foodTag))
+        // 检测小食物
+        GameObject food = _foodManager.GetCurrentFood();
+        if (food != null && Vector3.Distance(snakePosition, food.transform.localPosition) < 0.5f)
         {
             CollectFood();
+            return;
         }
 
-        // 检查大食物碰撞
-        if (other.gameObject.CompareTag(_gameSetting.bigFoodTag))
+        // 检测大食物
+        GameObject bigFood = _foodManager.GetCurrentBigFood();
+        if (bigFood != null && Vector3.Distance(snakePosition, bigFood.transform.localPosition) < 0.5f)
         {
             CollectBigFood();
         }
+    }
 
-        // 检查边界碰撞
-        if (other.gameObject.CompareTag(_gameSetting.boundaryTag))
+    // 旋转蛇头以匹配移动方向
+    void RotateHead()
+    {
+        if (_head != null)
         {
-            GameOver();
-        }
+            // 根据移动方向计算旋转角度
+            float angle = 0f;
 
-        // 检查蛇身碰撞
-        if (other.gameObject.CompareTag(_gameSetting.bodyTag))
-        {
-            GameOver();
+            if (_direction == Vector3.forward)
+            {
+                angle = 0f; // 向前 (Z轴正方向)
+            }
+            else if (_direction == Vector3.right)
+            {
+                angle = 90f; // 向右 (X轴正方向)
+            }
+            else if (_direction == Vector3.back)
+            {
+                angle = 180f; // 向后 (Z轴负方向)
+            }
+            else if (_direction == Vector3.left)
+            {
+                angle = 270f; // 向左 (X轴负方向)
+            }
+
+            // 应用旋转
+            _head.transform.localRotation = Quaternion.Euler(0f, angle, 0f);
         }
     }
 
@@ -387,59 +392,15 @@ public class SnakeController : MonoBehaviour
         // 更新得分显示
         _uiManager.SetScore(_score);
 
-        // 生成新的身体段
-        GameObject newBodyPart;
-        if (_bodyPrefab != null)
+        // 启动身体变色动画
+        if (_bodyManager != null)
         {
-            newBodyPart = Instantiate(_bodyPrefab, transform);
-        }
-        else
-        {
-            // 如果预制体未设置，使用默认从head实例化
-            newBodyPart = Instantiate(_head, transform);
-
-            // 为新身体段设置BodyMaterial材质
-            Renderer renderer = newBodyPart.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                Material bodyMaterial = Resources.Load<Material>("Materials/BodyMaterial");
-                if (bodyMaterial != null)
-                {
-                    renderer.material = bodyMaterial;
-                }
-            }
-        }
-        newBodyPart.name = "Body" + (_bodyParts.Count + 1);
-        newBodyPart.tag = _gameSetting.bodyTag;
-
-        // 如果有身体段，将新身体段放在最后一个身体段的位置
-        if (_bodyParts.Count > 0)
-        {
-            newBodyPart.transform.localPosition = _bodyParts[_bodyParts.Count - 1].transform.localPosition;
-        }
-        else
-        {
-            // 如果没有身体段，将新身体段放在蛇头的位置
-            newBodyPart.transform.localPosition = _head.transform.localPosition;
-        }
-
-        _bodyParts.Add(newBodyPart);
-
-        // 更新食物管理器的身体段引用
-        _foodManager.UpdateBodyPartsReference(_bodyParts);
-
-        // 更新自动寻路组件的身体段引用
-        if (_autoPathfinding != null)
-        {
-            _autoPathfinding.UpdateBodyPartsReference(_bodyParts);
+            _bodyManager.StartColorChangeAnimation(_gameSetting.targetColor);
         }
 
         // 销毁当前食物并重新生成
         _foodManager.ClearFood();
         _foodManager.SpawnFood();
-
-        // 调整身体大小
-        AdjustBodySizes();
     }
 
     // 收集大食物
@@ -452,98 +413,18 @@ public class SnakeController : MonoBehaviour
         // 更新得分显示
         _uiManager.SetScore(_score);
 
-        // 生成多个新的身体段（大食物奖励）
-        int bodyPartsToAdd = bigFoodScore;
-        for (int i = 0; i < bodyPartsToAdd; i++)
+        // 启动身体变色动画（大食物使用特殊颜色）
+        if (_bodyManager != null)
         {
-            GameObject newBodyPart;
-            if (_bodyPrefab != null)
-            {
-                newBodyPart = Instantiate(_bodyPrefab, transform);
-            }
-            else
-            {
-                // 如果预制体未设置，使用默认从head实例化
-                newBodyPart = Instantiate(_head, transform);
-
-                // 为新身体段设置BodyMaterial材质
-                Renderer renderer = newBodyPart.GetComponent<Renderer>();
-                if (renderer != null)
-                {
-                    Material bodyMaterial = Resources.Load<Material>("Materials/BodyMaterial");
-                    if (bodyMaterial != null)
-                    {
-                        renderer.material = bodyMaterial;
-                    }
-                }
-            }
-            newBodyPart.name = "Body" + (_bodyParts.Count + 1);
-            newBodyPart.tag = _gameSetting.bodyTag;
-
-            // 如果有身体段，将新身体段放在最后一个身体段的位置
-            if (_bodyParts.Count > 0)
-            {
-                newBodyPart.transform.localPosition = _bodyParts[_bodyParts.Count - 1].transform.localPosition;
-            }
-            else
-            {
-                // 如果没有身体段，将新身体段放在蛇头的位置
-                newBodyPart.transform.localPosition = _head.transform.localPosition;
-            }
-
-            _bodyParts.Add(newBodyPart);
-        }
-
-        // 更新食物管理器的身体段引用
-        _foodManager.UpdateBodyPartsReference(_bodyParts);
-
-        // 更新自动寻路组件的身体段引用
-        if (_autoPathfinding != null)
-        {
-            _autoPathfinding.UpdateBodyPartsReference(_bodyParts);
+            _bodyManager.StartColorChangeAnimation(_gameSetting.targetColor);
         }
 
         // 销毁当前大食物并重新生成
         _foodManager.ClearBigFood();
         _foodManager.SpawnFood();
-
-        // 调整身体大小
-        AdjustBodySizes();
     }
 
-    // 调整身体大小
-    void AdjustBodySizes()
-    {
-        int bodyCount = _bodyParts.Count;
-        if (bodyCount == 0)
-            return;
 
-        // 计算需要逐渐变小的身体段数量
-        int shrinkCount = Mathf.Max(1, Mathf.FloorToInt((_gameSetting.maxBodySize - _gameSetting.minBodySize) / _gameSetting.sizeDecrement) + 1);
-        shrinkCount = Mathf.Min(shrinkCount, bodyCount);
-
-        // 从头部开始往后逐渐变小
-        for (int i = 0; i < bodyCount; i++)
-        {
-            GameObject bodyPart = _bodyParts[i];
-            if (bodyPart != null)
-            {
-                if (i < shrinkCount)
-                {
-                    // 逐渐变小
-                    float scaleFactor = _gameSetting.maxBodySize - (i * _gameSetting.sizeDecrement);
-                    // 确保不小于最小尺寸
-                    scaleFactor = Mathf.Max(scaleFactor, _gameSetting.minBodySize);
-                    bodyPart.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-                }
-                else
-                {
-                    // 最小大小
-                    bodyPart.transform.localScale = new Vector3(_gameSetting.minBodySize, _gameSetting.minBodySize, _gameSetting.minBodySize);
-                }
-            }
-        }
-    }
 
     // 游戏结束
     void GameOver()
@@ -581,6 +462,28 @@ public class SnakeController : MonoBehaviour
         }
 
         SetGameState(GameState.GameOver);
+    }
+
+    // 初始化身体动画事件
+    private void InitializeBodyEvents()
+    {
+        if (_bodyManager != null)
+        {
+            _bodyManager.OnBodyAnimationComplete += OnBodyAnimationComplete;
+        }
+    }
+
+    // 身体动画完成回调
+    private void OnBodyAnimationComplete()
+    {
+        // 更新食物管理器的身体段引用
+        _foodManager.UpdateBodyPartsReference(_bodyManager.GetBodyParts());
+
+        // 更新自动寻路组件的身体段引用
+        if (_autoPathfinding != null)
+        {
+            _autoPathfinding.UpdateBodyPartsReference(_bodyManager.GetBodyParts());
+        }
     }
 
     // 切换自动模式
