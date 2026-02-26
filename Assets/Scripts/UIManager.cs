@@ -32,7 +32,7 @@ public class UIManager : MonoBehaviour
     }
 
     // 更新自动模式显示
-    private void updateAutoModeDisplay()
+    private void UpdateAutoModeDisplay()
     {
         if (_autoModeText != null)
         {
@@ -44,7 +44,7 @@ public class UIManager : MonoBehaviour
     public void UpdateAutoModeDisplay(bool isAutoMode)
     {
         _autoMode = isAutoMode;
-        updateAutoModeDisplay();
+        UpdateAutoModeDisplay();
     }
 
     public void SetScore(int score)

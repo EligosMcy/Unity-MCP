@@ -4,11 +4,7 @@ using UnityEngine;
 public class GameSettingScriptableObject : ScriptableObject
 {
     [Header("游戏设置")]
-    [Range(0.5f, 2f)]
-    [Tooltip("移动速度")]
-    public float moveSpeed = 1.0f;
-
-    [Range(0.1f, 0.5f)]
+    [Range(0.02f, 0.5f)]
     [Tooltip("移动间隔")]
     public float moveInterval = 0.2f;
 
@@ -27,8 +23,17 @@ public class GameSettingScriptableObject : ScriptableObject
     public GameObject boundaryPrefab;
 
     [Header("蛇身设置")]
-    [Tooltip("身体大小缩放系数")]
-    public float bodyScaleFactor = 0.8f;
+    [Range(0.5f, 2.0f)]
+    [Tooltip("最大身体尺寸（第一个身体）")]
+    public float maxBodySize = 0.8f;
+
+    [Range(0.01f, 0.5f)]
+    [Tooltip("尺寸变化间隔")]
+    public float sizeDecrement = 0.1f;
+
+    [Range(0.1f, 1.0f)]
+    [Tooltip("最小身体尺寸")]
+    public float minBodySize = 0.4f;
 
     [Header("标签设置")]
     [Tooltip("边界标签")]
@@ -36,4 +41,7 @@ public class GameSettingScriptableObject : ScriptableObject
 
     [Tooltip("食物标签")]
     public string foodTag = "Food";
+
+    [Tooltip("蛇身标签")]
+    public string bodyTag = "Body";
 }

@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class SnakeHeadTrigger : MonoBehaviour
 {
-    private SnakeController snakeController;
+    private SnakeController _snakeController;
     
     private void Awake()
     {
         // 自动查找父层级中的SnakeController组件
-        snakeController = GetComponentInParent<SnakeController>();
+        _snakeController = GetComponentInParent<SnakeController>();
         
-        if (snakeController == null)
+        if (_snakeController == null)
         {
             Debug.LogError("SnakeController not found in parent hierarchy!");
         }
@@ -17,9 +17,9 @@ public class SnakeHeadTrigger : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
-        if (snakeController != null)
+        if (_snakeController != null)
         {
-            snakeController.HandleTriggerEnter(other);
+            _snakeController.HandleTriggerEnter(other);
         }
     }
 }

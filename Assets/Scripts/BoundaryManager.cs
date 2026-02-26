@@ -14,12 +14,12 @@ public class BoundaryManager : MonoBehaviour
         
         if (_gameSetting != null)
         {
-            generateBoundary();
+            GenerateBoundary();
         }
     }
     
     // 生成边界
-    private void generateBoundary()
+    private void GenerateBoundary()
     {
         if (_gameSetting == null)
         {

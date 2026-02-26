@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb7cfd25ff0061b478346efa490adaaa, type: 3}
   m_Name: DefaultGameSetting
   m_EditorClassIdentifier: Assembly-CSharp::GameSettingScriptableObject
-  moveSpeed: 2
-  moveInterval: 0.1
+  moveInterval: 0.05
   boundary: 9
   bodyPrefab: {fileID: 5240934946400085796, guid: 6af6ff5c3f2076f4ea0dd43305725d44, type: 3}
   foodPrefab: {fileID: 1051337458043275537, guid: 6c00c9a2518c93940831aa8361dfbb90, type: 3}
   boundaryPrefab: {fileID: 8895241562760111225, guid: 39324d2814e8567458b341c4e1a954b8, type: 3}
-  bodyScaleFactor: 0.8
+  maxBodySize: 0.8
+  sizeDecrement: 0.1
+  minBodySize: 0.4
   boundaryTag: Boundary
   foodTag: Food
+  bodyTag: Body

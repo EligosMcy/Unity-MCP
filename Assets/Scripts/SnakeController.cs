@@ -53,8 +53,7 @@ public class SnakeController : MonoBehaviour
     // 移动间隔
     private float _moveInterval = 0.2f;
 
-    // 蛇的移动速度
-    private float _moveSpeed = 1.0f;
+
 
     // 移动方向
     private Vector3 _direction = Vector3.right;
@@ -67,9 +66,6 @@ public class SnakeController : MonoBehaviour
 
     // 得分
     private int _score = 0;
-
-    // 身体大小缩放系数
-    private float _bodyScaleFactor = 0.8f;
 
     // 自动模式标志
     private bool _autoMode = false;
@@ -90,9 +86,7 @@ public class SnakeController : MonoBehaviour
         {
             _bodyPrefab = _gameSetting.bodyPrefab;
             _boundary = _gameSetting.boundary;
-            _moveSpeed = _gameSetting.moveSpeed;
             _moveInterval = _gameSetting.moveInterval;
-            _bodyScaleFactor = _gameSetting.bodyScaleFactor;
 
             // 更新自动寻路组件的边界值
             if (_autoPathfinding != null)
@@ -188,10 +182,10 @@ public class SnakeController : MonoBehaviour
     {
         // 重置游戏结束标志
         _isGameOverCalled = false;
-        
+
         // 取消所有挂起的 Invoke 调用
         CancelInvoke("StartGame");
-        
+
         // 重置得分
         _score = 0;
         _uiManager.SetScore(_score);
@@ -329,22 +323,13 @@ public class SnakeController : MonoBehaviour
         // 如果游戏已经结束，不执行移动
         if (_isGameOverCalled)
             return;
-        
+
         // 记录蛇头的当前位置
         Vector3 previousPosition = _head.transform.localPosition;
 
         // 移动蛇头
         _head.transform.localPosition += _direction;
 
-        // 检查自身碰撞
-        foreach (GameObject bodyPart in _bodyParts)
-        {
-            if (Vector3.Distance(_head.transform.localPosition, bodyPart.transform.localPosition) < 0.5f)
-            {
-                GameOver();
-                return;
-            }
-        }
 
         // 移动蛇身
         if (_bodyParts.Count > 0)
@@ -367,7 +352,7 @@ public class SnakeController : MonoBehaviour
         // 如果游戏已经结束，不处理碰撞
         if (_isGameOverCalled)
             return;
-        
+
         // 检查食物碰撞
         if (other.gameObject.CompareTag(_gameSetting.foodTag))
         {
@@ -376,6 +361,12 @@ public class SnakeController : MonoBehaviour
 
         // 检查边界碰撞
         if (other.gameObject.CompareTag(_gameSetting.boundaryTag))
+        {
+            GameOver();
+        }
+
+        // 检查蛇身碰撞
+        if (other.gameObject.CompareTag(_gameSetting.bodyTag))
         {
             GameOver();
         }
@@ -413,6 +404,7 @@ public class SnakeController : MonoBehaviour
             }
         }
         newBodyPart.name = "Body" + (_bodyParts.Count + 1);
+        newBodyPart.tag = _gameSetting.bodyTag;
 
         // 如果有身体段，将新身体段放在最后一个身体段的位置
         if (_bodyParts.Count > 0)
@@ -451,8 +443,9 @@ public class SnakeController : MonoBehaviour
         if (bodyCount == 0)
             return;
 
-        // 计算需要逐渐变小的身体段数量（最多5个）
-        int shrinkCount = Mathf.Min(5, bodyCount);
+        // 计算需要逐渐变小的身体段数量
+        int shrinkCount = Mathf.Max(1, Mathf.FloorToInt((_gameSetting.maxBodySize - _gameSetting.minBodySize) / _gameSetting.sizeDecrement) + 1);
+        shrinkCount = Mathf.Min(shrinkCount, bodyCount);
 
         // 从头部开始往后逐渐变小
         for (int i = 0; i < bodyCount; i++)
@@ -463,22 +456,15 @@ public class SnakeController : MonoBehaviour
                 if (i < shrinkCount)
                 {
                     // 逐渐变小
-                    float scaleFactor;
-                    if (shrinkCount > 1)
-                    {
-                        scaleFactor = 1.0f - (i * (1.0f - _bodyScaleFactor) / (shrinkCount - 1));
-                    }
-                    else
-                    {
-                        // 避免除以零，当只有一个身体段时使用默认大小
-                        scaleFactor = 1.0f;
-                    }
+                    float scaleFactor = _gameSetting.maxBodySize - (i * _gameSetting.sizeDecrement);
+                    // 确保不小于最小尺寸
+                    scaleFactor = Mathf.Max(scaleFactor, _gameSetting.minBodySize);
                     bodyPart.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
                 }
                 else
                 {
                     // 最小大小
-                    bodyPart.transform.localScale = new Vector3(_bodyScaleFactor, _bodyScaleFactor, _bodyScaleFactor);
+                    bodyPart.transform.localScale = new Vector3(_gameSetting.minBodySize, _gameSetting.minBodySize, _gameSetting.minBodySize);
                 }
             }
         }
@@ -490,35 +476,35 @@ public class SnakeController : MonoBehaviour
         // 防止重复调用 GameOver
         if (_isGameOverCalled)
             return;
-        
+
         _isGameOverCalled = true;
         _gameOver = true;
         Debug.Log("Game Over! Score: " + _score);
-        
+
         // 如果是自动模式，记录统计信息并自动重新开始
         if (_autoMode)
         {
             // 记录分数
             _autoModeScores.Add(_score);
             _autoModeRounds++;
-            
+
             // 更新最高分
             if (_score > _autoModeHighScore)
             {
                 _autoModeHighScore = _score;
             }
-            
+
             // 输出统计信息
             Debug.Log("Auto Mode Round: " + _autoModeRounds);
             Debug.Log("Current Score: " + _score);
             Debug.Log("High Score: " + _autoModeHighScore);
             Debug.Log("All Scores: " + string.Join(", ", _autoModeScores));
-            
+
             // 延迟一段时间后自动重新开始
             Invoke("StartGame", 1.0f);
             return;
         }
-        
+
         SetGameState(GameState.GameOver);
     }
 
@@ -528,7 +514,7 @@ public class SnakeController : MonoBehaviour
         _autoMode = !_autoMode;
         _uiManager.UpdateAutoModeDisplay(_autoMode);
         Debug.Log("Auto mode " + (_autoMode ? "enabled" : "disabled"));
-        
+
         // 如果启用自动模式，重置统计信息
         if (_autoMode)
         {
