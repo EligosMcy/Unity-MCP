@@ -16,10 +16,14 @@ MonoBehaviour:
   boundary: 9
   bodyPrefab: {fileID: 5240934946400085796, guid: 6af6ff5c3f2076f4ea0dd43305725d44, type: 3}
   foodPrefab: {fileID: 1051337458043275537, guid: 6c00c9a2518c93940831aa8361dfbb90, type: 3}
+  bigFoodPrefab: {fileID: 5412066196410301136, guid: f63ce9356c4555d458e98058128aa1a3, type: 3}
   boundaryPrefab: {fileID: 8895241562760111225, guid: 39324d2814e8567458b341c4e1a954b8, type: 3}
   maxBodySize: 0.8
   sizeDecrement: 0.1
   minBodySize: 0.4
+  smallFoodScore: 1
+  bigFoodScore: 5
   boundaryTag: Boundary
   foodTag: Food
+  bigFoodTag: BigFood
   bodyTag: Body

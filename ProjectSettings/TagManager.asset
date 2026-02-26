@@ -7,6 +7,7 @@ TagManager:
   - Boundary
   - Food
   - Body
+  - BigFood
   layers:
   - Default
   - TransparentFX

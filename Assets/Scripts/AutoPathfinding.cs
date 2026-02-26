@@ -36,7 +36,7 @@ public class AutoPathfinding : MonoBehaviour
     public Vector3 CalculatePath(Vector3 headPos)
     {
         // 获取食物位置
-        GameObject food = _foodManager.GetFood();
+        GameObject food = _foodManager.GetActiveFood();
         if (food == null)
             return _direction;
 

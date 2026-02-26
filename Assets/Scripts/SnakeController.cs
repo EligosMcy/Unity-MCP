@@ -353,10 +353,16 @@ public class SnakeController : MonoBehaviour
         if (_isGameOverCalled)
             return;
 
-        // 检查食物碰撞
+        // 检查小食物碰撞
         if (other.gameObject.CompareTag(_gameSetting.foodTag))
         {
             CollectFood();
+        }
+
+        // 检查大食物碰撞
+        if (other.gameObject.CompareTag(_gameSetting.bigFoodTag))
+        {
+            CollectBigFood();
         }
 
         // 检查边界碰撞
@@ -430,6 +436,75 @@ public class SnakeController : MonoBehaviour
 
         // 销毁当前食物并重新生成
         _foodManager.ClearFood();
+        _foodManager.SpawnFood();
+
+        // 调整身体大小
+        AdjustBodySizes();
+    }
+
+    // 收集大食物
+    void CollectBigFood()
+    {
+        // 增加得分（大食物分数）
+        int bigFoodScore = _foodManager.GetBigFoodScore();
+        _score += bigFoodScore;
+
+        // 更新得分显示
+        _uiManager.SetScore(_score);
+
+        // 生成多个新的身体段（大食物奖励）
+        int bodyPartsToAdd = bigFoodScore;
+        for (int i = 0; i < bodyPartsToAdd; i++)
+        {
+            GameObject newBodyPart;
+            if (_bodyPrefab != null)
+            {
+                newBodyPart = Instantiate(_bodyPrefab, transform);
+            }
+            else
+            {
+                // 如果预制体未设置，使用默认从head实例化
+                newBodyPart = Instantiate(_head, transform);
+
+                // 为新身体段设置BodyMaterial材质
+                Renderer renderer = newBodyPart.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    Material bodyMaterial = Resources.Load<Material>("Materials/BodyMaterial");
+                    if (bodyMaterial != null)
+                    {
+                        renderer.material = bodyMaterial;
+                    }
+                }
+            }
+            newBodyPart.name = "Body" + (_bodyParts.Count + 1);
+            newBodyPart.tag = _gameSetting.bodyTag;
+
+            // 如果有身体段，将新身体段放在最后一个身体段的位置
+            if (_bodyParts.Count > 0)
+            {
+                newBodyPart.transform.localPosition = _bodyParts[_bodyParts.Count - 1].transform.localPosition;
+            }
+            else
+            {
+                // 如果没有身体段，将新身体段放在蛇头的位置
+                newBodyPart.transform.localPosition = _head.transform.localPosition;
+            }
+
+            _bodyParts.Add(newBodyPart);
+        }
+
+        // 更新食物管理器的身体段引用
+        _foodManager.UpdateBodyPartsReference(_bodyParts);
+
+        // 更新自动寻路组件的身体段引用
+        if (_autoPathfinding != null)
+        {
+            _autoPathfinding.UpdateBodyPartsReference(_bodyParts);
+        }
+
+        // 销毁当前大食物并重新生成
+        _foodManager.ClearBigFood();
         _foodManager.SpawnFood();
 
         // 调整身体大小

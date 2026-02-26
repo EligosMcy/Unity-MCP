@@ -86,7 +86,7 @@ public class PathfindingVisualizer : MonoBehaviour
         if (_autoPathfinding == null || _foodManager == null)
             return;
 
-        GameObject food = _foodManager.GetFood();
+        GameObject food = _foodManager.GetActiveFood();
         if (food == null)
             return;
 
@@ -291,7 +291,7 @@ public class PathfindingVisualizer : MonoBehaviour
         {
             Debug.LogWarning("无法找到到达食物的路径！");
             Debug.LogWarning("蛇头位置: " + headPos);
-            Debug.LogWarning("食物位置: " + _foodManager.GetFood().transform.position);
+            Debug.LogWarning("食物位置: " + _foodManager.GetActiveFood().transform.position);
             Debug.LogWarning("最远可达位置: " + farthestPos);
         }
     }

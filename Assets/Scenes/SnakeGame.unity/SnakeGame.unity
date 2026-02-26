@@ -491,6 +491,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FoodManager
   _gameSetting: {fileID: 11400000, guid: 63aae92983a8775408b16c9341ccbc77, type: 2}
   _food: {fileID: 0}
+  _bigFood: {fileID: 0}
 --- !u!4 &375981656
 Transform:
   m_ObjectHideFlags: 0
@@ -663,9 +664,11 @@ MonoBehaviour:
   _showWalkableGrid: 1
   _showPath: 1
   _showUnreachable: 1
+  _showFoodSpawnPositions: 1
   _walkableColor: {r: 0, g: 1, b: 0, a: 0.3}
   _pathColor: {r: 1, g: 1, b: 0, a: 0.8}
   _unreachableColor: {r: 1, g: 0, b: 0, a: 0.8}
+  _foodSpawnColor: {r: 0, g: 0, b: 1, a: 0.5}
 --- !u!4 &612503469
 Transform:
   m_ObjectHideFlags: 0
