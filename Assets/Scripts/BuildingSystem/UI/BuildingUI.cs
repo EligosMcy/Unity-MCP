@@ -8,17 +8,17 @@ public class BuildingUI : MonoBehaviour
 {
     public static BuildingUI Instance { get; private set; }
 
-    [Header("蓝图选择")]
+    [Header("Blueprint Selection")]
     public GameObject blueprintPanel;
     public Transform blueprintListContainer;
     public GameObject blueprintItemPrefab;
 
-    [Header("材料管理")]
+    [Header("Material Management")]
     public GameObject materialPanel;
     public Transform materialListContainer;
     public GameObject materialItemPrefab;
 
-    [Header("建造控制")]
+    [Header("Build Control")]
     public GameObject buildControlPanel;
     public Button buildButton;
     public Button clearButton;
@@ -28,17 +28,17 @@ public class BuildingUI : MonoBehaviour
     public TextMeshProUGUI materialStatusText;
     public TextMeshProUGUI levelStatusText;
 
-    [Header("地图坐标输入")]
+    [Header("Map Coordinate Input")]
     public TMP_InputField mapXInput;
     public TMP_InputField mapYInput;
 
-    [Header("等级显示")]
+    [Header("Level Display")]
     public TextMeshProUGUI woodworkingLevelText;
     public TextMeshProUGUI constructionLevelText;
     public Button increaseWoodworkingButton;
     public Button increaseConstructionButton;
 
-    [Header("错误提示")]
+    [Header("Error Prompt")]
     public GameObject errorPanel;
     public TextMeshProUGUI errorText;
     public Button errorOkButton;
@@ -153,22 +153,22 @@ public class BuildingUI : MonoBehaviour
     {
         if (blueprintInfoText == null || _selectedBlueprint == null) return;
         blueprintInfoText.text =
-            $"蓝图: {_selectedBlueprint.blueprintName}\n" +
-            $"尺寸: {_selectedBlueprint.width}x{_selectedBlueprint.height}x{_selectedBlueprint.depth}\n" +
-            $"方块总数: {_selectedBlueprint.GetTotalBlockCount()}\n" +
-            $"描述: {_selectedBlueprint.description}";
+            $"Blueprint: {_selectedBlueprint.blueprintName}\n" +
+            $"Size: {_selectedBlueprint.width}x{_selectedBlueprint.height}x{_selectedBlueprint.depth}\n" +
+            $"Total Blocks: {_selectedBlueprint.GetTotalBlockCount()}\n" +
+            $"Description: {_selectedBlueprint.description}";
     }
 
     private void UpdateMaterialStatus()
     {
         if (materialStatusText == null || _selectedBlueprint == null) return;
 
-        string status = "材料需求:\n";
+        string status = "Material Requirements:\n";
         foreach (var req in _selectedBlueprint.materialRequirements)
         {
             int cur = MaterialInventory.Instance.GetMaterialCount(req.Key);
             status += $"{req.Key}: {cur}/{req.Value}";
-            if (cur < req.Value) status += " [不足]";
+            if (cur < req.Value) status += " [Insufficient]";
             status += "\n";
         }
         materialStatusText.text = status;
@@ -195,9 +195,9 @@ public class BuildingUI : MonoBehaviour
     private void UpdateLevelDisplay()
     {
         if (woodworkingLevelText != null)
-            woodworkingLevelText.text = $"木工等级: {BuildingLevelManager.Instance.GetWoodworkingLevel()}";
+            woodworkingLevelText.text = $"Woodworking Level: {BuildingLevelManager.Instance.GetWoodworkingLevel()}";
         if (constructionLevelText != null)
-            constructionLevelText.text = $"建筑等级: {BuildingLevelManager.Instance.GetConstructionLevel()}";
+            constructionLevelText.text = $"Construction Level: {BuildingLevelManager.Instance.GetConstructionLevel()}";
     }
 
     /// 显示当前坐标建造进度（包括未完成的暂停任务）
@@ -214,11 +214,11 @@ public class BuildingUI : MonoBehaviour
         if (buildProgressText != null)
         {
             if (progress <= 0f)
-                buildProgressText.text = "尚未开始";
+                buildProgressText.text = "Not Started";
             else if (progress >= 1f)
-                buildProgressText.text = "建造完成!";
+                buildProgressText.text = "Building Complete!";
             else
-                buildProgressText.text = $"建造进度: {progress * 100:F1}%";
+                buildProgressText.text = $"Building Progress: {progress * 100:F1}%";
         }
     }
 
@@ -261,14 +261,14 @@ public class BuildingUI : MonoBehaviour
     }
 
     private void OnBuildingError(string error) => ShowError(error);
-    private void OnColorApplied(Color color) => Debug.Log($"颜色已应用: {color}");
+    private void OnColorApplied(Color color) => Debug.Log($"Color applied: {color}");
 
     // ---- 按钮事件 ----
 
     private void OnBuildButtonClicked()
     {
-        if (_selectedBlueprint == null) { ShowError("请先选择一个蓝图"); return; }
-        if (BuildingExecutor.Instance == null) { ShowError("建造系统未初始化"); return; }
+        if (_selectedBlueprint == null) { ShowError("Please select a blueprint first"); return; }
+        if (BuildingExecutor.Instance == null) { ShowError("Building system not initialized"); return; }
         if (!BuildingExecutor.Instance.CheckCanBuild(_selectedBlueprint)) return;
 
         // 直接启动——材料消耗在协程里逐块进行

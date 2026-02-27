@@ -75,19 +75,19 @@ public class BuildingLevelManager : MonoBehaviour
 
     public string GetLevelRequirementsText(BuildingLevelData requiredLevel)
     {
-        if (requiredLevel == null) return "无等级要求";
+        if (requiredLevel == null) return "No Level Requirements";
 
-        string text = "等级要求:\n";
-        text += $"木工等级: {requiredLevel.woodworkingLevel} (当前: {_woodworkingLevel})";
+        string text = "Level Requirements:\n";
+        text += $"Woodworking Level: {requiredLevel.woodworkingLevel} (Current: {_woodworkingLevel})";
         if (_woodworkingLevel < requiredLevel.woodworkingLevel)
         {
-            text += " [不足]";
+            text += " [Insufficient]";
         }
         text += "\n";
-        text += $"建筑等级: {requiredLevel.constructionLevel} (当前: {_constructionLevel})";
+        text += $"Construction Level: {requiredLevel.constructionLevel} (Current: {_constructionLevel})";
         if (_constructionLevel < requiredLevel.constructionLevel)
         {
-            text += " [不足]";
+            text += " [Insufficient]";
         }
 
         return text;

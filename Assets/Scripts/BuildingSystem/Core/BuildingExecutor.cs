@@ -54,12 +54,12 @@ public class BuildingExecutor : MonoBehaviour
     {
         if (blueprint == null)
         {
-            OnBuildingError?.Invoke("蓝图数据为空");
+            OnBuildingError?.Invoke("Blueprint data is null");
             return false;
         }
         if (!BuildingLevelManager.Instance.CanBuildWithLevel(blueprint.requiredLevel))
         {
-            OnBuildingError?.Invoke("等级不足，无法建造");
+            OnBuildingError?.Invoke("Insufficient level to build");
             return false;
         }
         return true;
@@ -85,7 +85,7 @@ public class BuildingExecutor : MonoBehaviour
     {
         if (_isBuilding)
         {
-            OnBuildingError?.Invoke("正在建造中，请稍候");
+            OnBuildingError?.Invoke("Building in progress, please wait");
             return;
         }
         if (!CheckCanBuild(blueprint)) return;
@@ -131,7 +131,7 @@ public class BuildingExecutor : MonoBehaviour
                 _isBuilding = false;
                 _activeSessionKey = null;
                 OnBuildingPaused?.Invoke(session.blueprint, session.mapPosition);
-                OnBuildingError?.Invoke($"材料不足：缺少 {blockData.materialType}，建造已暂停");
+                OnBuildingError?.Invoke($"Insufficient materials: Missing {blockData.materialType}, building paused");
                 yield break;
             }
 

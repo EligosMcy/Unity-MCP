@@ -38,11 +38,11 @@ public class BlueprintCreator : EditorWindow
     private void CreateSimpleHouseBlueprint()
     {
         BlueprintData blueprint = ScriptableObject.CreateInstance<BlueprintData>();
-        blueprint.blueprintName = "简单房子";
+        blueprint.blueprintName = "Simple House";
         blueprint.width = 5;
         blueprint.height = 3;
         blueprint.depth = 5;
-        blueprint.description = "一个简单的3x3房子，带屋顶";
+        blueprint.description = "A simple 3x3 house with a roof";
         blueprint.blocks = new List<BlockData>();
 
         for (int x = 0; x < 5; x++)
@@ -79,11 +79,11 @@ public class BlueprintCreator : EditorWindow
     private void CreateTowerBlueprint()
     {
         BlueprintData blueprint = ScriptableObject.CreateInstance<BlueprintData>();
-        blueprint.blueprintName = "高塔";
+        blueprint.blueprintName = "Tower";
         blueprint.width = 3;
         blueprint.height = 8;
         blueprint.depth = 3;
-        blueprint.description = "一座8层高的塔楼";
+        blueprint.description = "An 8-story tower";
         blueprint.blocks = new List<BlockData>();
 
         for (int y = 0; y < 8; y++)
@@ -120,11 +120,11 @@ public class BlueprintCreator : EditorWindow
     private void CreateBridgeBlueprint()
     {
         BlueprintData blueprint = ScriptableObject.CreateInstance<BlueprintData>();
-        blueprint.blueprintName = "桥梁";
+        blueprint.blueprintName = "Bridge";
         blueprint.width = 7;
         blueprint.height = 2;
         blueprint.depth = 3;
-        blueprint.description = "一座跨越河流的桥梁";
+        blueprint.description = "A bridge across a river";
         blueprint.blocks = new List<BlockData>();
 
         for (int x = 0; x < 7; x++)
@@ -159,7 +159,7 @@ public class BlueprintCreator : EditorWindow
         level1.level = 1;
         level1.woodworkingLevel = 1;
         level1.constructionLevel = 1;
-        level1.description = "初级建造者，可以建造简单的建筑";
+        level1.description = "Beginner builder, can build simple structures";
 
         string path1 = "Assets/Resources/BuildingLevels/Level1Requirements.asset";
         AssetDatabase.CreateAsset(level1, path1);
@@ -168,7 +168,7 @@ public class BlueprintCreator : EditorWindow
         level2.level = 2;
         level2.woodworkingLevel = 3;
         level2.constructionLevel = 3;
-        level2.description = "中级建造者，可以建造更复杂的结构";
+        level2.description = "Intermediate builder, can build more complex structures";
 
         string path2 = "Assets/Resources/BuildingLevels/Level2Requirements.asset";
         AssetDatabase.CreateAsset(level2, path2);
@@ -177,7 +177,7 @@ public class BlueprintCreator : EditorWindow
         level3.level = 3;
         level3.woodworkingLevel = 5;
         level3.constructionLevel = 5;
-        level3.description = "高级建造者，可以建造大型建筑";
+        level3.description = "Advanced builder, can build large structures";
 
         string path3 = "Assets/Resources/BuildingLevels/Level3Requirements.asset";
         AssetDatabase.CreateAsset(level3, path3);

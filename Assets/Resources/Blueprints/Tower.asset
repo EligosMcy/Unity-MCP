@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87487bb616f3b4a9151b290e9574fc, type: 3}
   m_Name: Tower
   m_EditorClassIdentifier: Assembly-CSharp::BlueprintData
-  blueprintName: "\u9AD8\u5854"
+  blueprintName: Tower
   width: 3
   height: 8
   depth: 3
@@ -349,5 +349,5 @@ MonoBehaviour:
     amount: 32
   - materialType: 3
     amount: 1
-  requiredLevel: {fileID: 0}
-  description: "\u4E00\u5EA78\u5C42\u9AD8\u7684\u5854\u697C"
+  requiredLevel: {fileID: 11400000, guid: e373da4c89386c04289fa4ff40e00075, type: 2}
+  description: An 8-story tower
