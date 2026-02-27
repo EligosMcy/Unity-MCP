@@ -21,327 +21,327 @@ MonoBehaviour:
     y: 0
     z: 0
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 0
     y: 0
     z: 1
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 0
     y: 0
     z: 2
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 1
     y: 0
     z: 0
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 1
     y: 0
     z: 2
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 2
     y: 0
     z: 0
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 2
     y: 0
     z: 1
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 2
     y: 0
     z: 2
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 0
     y: 1
     z: 0
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 0
     y: 1
     z: 1
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 0
     y: 1
     z: 2
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 1
     y: 1
     z: 0
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 1
     y: 1
     z: 2
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 2
     y: 1
     z: 0
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 2
     y: 1
     z: 1
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 2
     y: 1
     z: 2
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 0
     y: 2
     z: 0
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 0
     y: 2
     z: 1
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 0
     y: 2
     z: 2
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 1
     y: 2
     z: 0
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 1
     y: 2
     z: 2
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 2
     y: 2
     z: 0
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 2
     y: 2
     z: 1
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 2
     y: 2
     z: 2
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 0
     y: 3
     z: 0
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 0
     y: 3
     z: 1
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 0
     y: 3
     z: 2
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 1
     y: 3
     z: 0
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 1
     y: 3
     z: 2
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 2
     y: 3
     z: 0
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 2
     y: 3
     z: 1
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 2
     y: 3
     z: 2
     materialType: 1
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    color: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   - x: 0
     y: 4
     z: 0
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 0
     y: 4
     z: 1
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 0
     y: 4
     z: 2
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 1
     y: 4
     z: 0
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 1
     y: 4
     z: 2
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 2
     y: 4
     z: 0
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 2
     y: 4
     z: 1
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 2
     y: 4
     z: 2
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 0
     y: 5
     z: 0
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 0
     y: 5
     z: 1
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 0
     y: 5
     z: 2
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 1
     y: 5
     z: 0
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 1
     y: 5
     z: 2
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 2
     y: 5
     z: 0
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 2
     y: 5
     z: 1
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 2
     y: 5
     z: 2
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 0
     y: 6
     z: 0
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 0
     y: 6
     z: 1
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 0
     y: 6
     z: 2
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 1
     y: 6
     z: 0
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 1
     y: 6
     z: 2
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 2
     y: 6
     z: 0
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 2
     y: 6
     z: 1
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 2
     y: 6
     z: 2
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 0
     y: 7
     z: 0
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 0
     y: 7
     z: 1
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 0
     y: 7
     z: 2
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 1
     y: 7
     z: 0
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 1
     y: 7
     z: 2
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 2
     y: 7
     z: 0
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 2
     y: 7
     z: 1
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 2
     y: 7
     z: 2
     materialType: 2
-    color: {r: 0, g: 0, b: 1, a: 1}
+    color: {r: 0.4, g: 0.4, b: 1, a: 1}
   - x: 1
     y: 7
     z: 1
     materialType: 3
-    color: {r: 0, g: 1, b: 1, a: 1}
+    color: {r: 0.6, g: 1, b: 1, a: 1}
   materialRequirementList:
   - materialType: 1
     amount: 32
@@ -349,5 +349,5 @@ MonoBehaviour:
     amount: 32
   - materialType: 3
     amount: 1
-  requiredLevel: {fileID: 11400000, guid: e373da4c89386c04289fa4ff40e00075, type: 2}
+  requiredLevel: {fileID: 0}
   description: An 8-story tower
