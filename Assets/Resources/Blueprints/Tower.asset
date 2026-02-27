@@ -1,0 +1,353 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87487bb616f3b4a9151b290e9574fc, type: 3}
+  m_Name: Tower
+  m_EditorClassIdentifier: Assembly-CSharp::BlueprintData
+  blueprintName: "\u9AD8\u5854"
+  width: 3
+  height: 8
+  depth: 3
+  blocks:
+  - x: 0
+    y: 0
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 0
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 0
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 1
+    y: 0
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 1
+    y: 0
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 0
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 0
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 0
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 1
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 1
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 1
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 1
+    y: 1
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 1
+    y: 1
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 1
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 1
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 1
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 2
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 2
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 2
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 1
+    y: 2
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 1
+    y: 2
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 2
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 2
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 2
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 3
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 3
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 3
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 1
+    y: 3
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 1
+    y: 3
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 3
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 3
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 3
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 4
+    z: 0
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 0
+    y: 4
+    z: 1
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 0
+    y: 4
+    z: 2
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 1
+    y: 4
+    z: 0
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 1
+    y: 4
+    z: 2
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 2
+    y: 4
+    z: 0
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 2
+    y: 4
+    z: 1
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 2
+    y: 4
+    z: 2
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 0
+    y: 5
+    z: 0
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 0
+    y: 5
+    z: 1
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 0
+    y: 5
+    z: 2
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 1
+    y: 5
+    z: 0
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 1
+    y: 5
+    z: 2
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 2
+    y: 5
+    z: 0
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 2
+    y: 5
+    z: 1
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 2
+    y: 5
+    z: 2
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 0
+    y: 6
+    z: 0
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 0
+    y: 6
+    z: 1
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 0
+    y: 6
+    z: 2
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 1
+    y: 6
+    z: 0
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 1
+    y: 6
+    z: 2
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 2
+    y: 6
+    z: 0
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 2
+    y: 6
+    z: 1
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 2
+    y: 6
+    z: 2
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 0
+    y: 7
+    z: 0
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 0
+    y: 7
+    z: 1
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 0
+    y: 7
+    z: 2
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 1
+    y: 7
+    z: 0
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 1
+    y: 7
+    z: 2
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 2
+    y: 7
+    z: 0
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 2
+    y: 7
+    z: 1
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 2
+    y: 7
+    z: 2
+    materialType: 2
+    color: {r: 0, g: 0, b: 1, a: 1}
+  - x: 1
+    y: 7
+    z: 1
+    materialType: 3
+    color: {r: 0, g: 1, b: 1, a: 1}
+  materialRequirementList:
+  - materialType: 1
+    amount: 32
+  - materialType: 2
+    amount: 32
+  - materialType: 3
+    amount: 1
+  requiredLevel: {fileID: 0}
+  description: "\u4E00\u5EA78\u5C42\u9AD8\u7684\u5854\u697C"

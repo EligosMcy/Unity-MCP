@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,15 +14,27 @@ public class BuildingExecutor : MonoBehaviour
     public float blockSpacing = 1.0f;
     public float buildDelay = 0.1f;
 
-    private BlueprintData _currentBlueprint;
-    private GameObject _buildingParent;
-    private Dictionary<Vector3Int, GameObject> _builtBlocks;
+    // key: 地图坐标 (x,y)
+    private Dictionary<Vector2Int, BuildingSession> _sessions;
+    private Vector2Int? _activeSessionKey;
     private bool _isBuilding = false;
 
-    public event Action<BlueprintData> OnBuildingStarted;
-    public event Action<BlueprintData> OnBuildingCompleted;
-    public event Action<float> OnBuildingProgress;
+    public event Action<BlueprintData, Vector2Int> OnBuildingStarted;
+    public event Action<BlueprintData, Vector2Int> OnBuildingCompleted;
+    public event Action<float, Vector2Int> OnBuildingProgress;
     public event Action<string> OnBuildingError;
+    public event Action<BlueprintData, Vector2Int> OnBuildingPaused;
+    public event Action<BlueprintData, Vector2Int> OnBuildingResumed;
+
+    private class BuildingSession
+    {
+        public BlueprintData blueprint;
+        public Vector2Int mapPosition;
+        public GameObject buildingParent;
+        public Dictionary<Vector3Int, GameObject> builtBlocks = new Dictionary<Vector3Int, GameObject>();
+        public int nextBlockIndex = 0;
+        public bool isCompleted = false;
+    }
 
     private void Awake()
     {
@@ -29,7 +42,7 @@ public class BuildingExecutor : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            _builtBlocks = new Dictionary<Vector3Int, GameObject>();
+            _sessions = new Dictionary<Vector2Int, BuildingSession>();
         }
         else
         {
@@ -44,154 +57,143 @@ public class BuildingExecutor : MonoBehaviour
             OnBuildingError?.Invoke("蓝图数据为空");
             return false;
         }
-
         if (!BuildingLevelManager.Instance.CanBuildWithLevel(blueprint.requiredLevel))
         {
             OnBuildingError?.Invoke("等级不足，无法建造");
             return false;
         }
-
         return true;
     }
 
-    public bool CheckMaterialsSufficient(BlueprintData blueprint)
+    public bool HasPendingSession(Vector2Int mapPosition)
     {
-        if (blueprint == null) return false;
-
-        return MaterialInventory.Instance.CheckMaterialSufficient(blueprint.materialRequirements);
+        return _sessions.TryGetValue(mapPosition, out var s) && !s.isCompleted;
     }
 
-    public void StartBuilding(BlueprintData blueprint, Vector3 position)
+    public float GetSessionProgress(Vector2Int mapPosition)
+    {
+        if (!_sessions.TryGetValue(mapPosition, out var s)) return 0f;
+        if (s.blueprint.blocks.Count == 0) return 0f;
+        return (float)s.nextBlockIndex / s.blueprint.blocks.Count;
+    }
+
+    /// <summary>
+    /// 开始建造。同一坐标已有未完成任务则继续，否则新建。
+    /// mapPosition 为二维地图坐标，世界 Y 固定为 0。
+    /// </summary>
+    public void StartBuilding(BlueprintData blueprint, Vector2Int mapPosition)
     {
         if (_isBuilding)
         {
             OnBuildingError?.Invoke("正在建造中，请稍候");
             return;
         }
+        if (!CheckCanBuild(blueprint)) return;
 
-        if (!CheckCanBuild(blueprint))
+        BuildingSession session;
+
+        if (_sessions.TryGetValue(mapPosition, out session) && !session.isCompleted)
         {
-            return;
+            OnBuildingResumed?.Invoke(blueprint, mapPosition);
         }
-
-        _currentBlueprint = blueprint;
-        _isBuilding = true;
-
-        CreateBuildingParent(position);
-        OnBuildingStarted?.Invoke(blueprint);
-
-        StartCoroutine(BuildCoroutine());
-    }
-
-    private void CreateBuildingParent(Vector3 position)
-    {
-        if (_buildingParent != null)
+        else
         {
-            Destroy(_buildingParent);
-        }
-
-        _buildingParent = new GameObject($"Building_{_currentBlueprint.blueprintName}");
-        _buildingParent.transform.position = position;
-    }
-
-    private System.Collections.IEnumerator BuildCoroutine()
-    {
-        int totalBlocks = _currentBlueprint.blocks.Count;
-        int builtBlocks = 0;
-
-        foreach (var blockData in _currentBlueprint.blocks)
-        {
-            Vector3 worldPosition = CalculateBlockPosition(blockData);
-            GameObject block = CreateBlock(blockData, worldPosition);
-
-            if (block != null)
+            session = new BuildingSession
             {
-                Vector3Int gridPosition = new Vector3Int(blockData.x, blockData.y, blockData.z);
-                _builtBlocks[gridPosition] = block;
+                blueprint      = blueprint,
+                mapPosition    = mapPosition,
+                nextBlockIndex = 0,
+                isCompleted    = false
+            };
+            Vector3 worldPos = new Vector3(mapPosition.x, 0f, mapPosition.y);
+            session.buildingParent = new GameObject($"Building_{blueprint.blueprintName}_{mapPosition.x}_{mapPosition.y}");
+            session.buildingParent.transform.position = worldPos;
+            _sessions[mapPosition] = session;
+            OnBuildingStarted?.Invoke(blueprint, mapPosition);
+        }
+
+        _activeSessionKey = mapPosition;
+        _isBuilding = true;
+        StartCoroutine(BuildCoroutine(session));
+    }
+
+    private IEnumerator BuildCoroutine(BuildingSession session)
+    {
+        int total = session.blueprint.blocks.Count;
+
+        while (session.nextBlockIndex < total)
+        {
+            BlockData blockData = session.blueprint.blocks[session.nextBlockIndex];
+
+            // 每个方块单独消耗 1 个对应材料
+            if (!MaterialInventory.Instance.ConsumeMaterial(blockData.materialType, 1))
+            {
+                _isBuilding = false;
+                _activeSessionKey = null;
+                OnBuildingPaused?.Invoke(session.blueprint, session.mapPosition);
+                OnBuildingError?.Invoke($"材料不足：缺少 {blockData.materialType}，建造已暂停");
+                yield break;
             }
 
-            builtBlocks++;
-            OnBuildingProgress?.Invoke((float)builtBlocks / totalBlocks);
+            Vector3 localPos = new Vector3(
+                blockData.x * blockSpacing,
+                blockData.y * blockSpacing,
+                blockData.z * blockSpacing);
+
+            GameObject block = CreateBlock(blockData, localPos, session.buildingParent.transform);
+            if (block != null)
+                session.builtBlocks[new Vector3Int(blockData.x, blockData.y, blockData.z)] = block;
+
+            session.nextBlockIndex++;
+            OnBuildingProgress?.Invoke((float)session.nextBlockIndex / total, session.mapPosition);
 
             yield return new WaitForSeconds(buildDelay);
         }
 
+        session.isCompleted = true;
         _isBuilding = false;
-        OnBuildingCompleted?.Invoke(_currentBlueprint);
+        _activeSessionKey = null;
+        OnBuildingCompleted?.Invoke(session.blueprint, session.mapPosition);
     }
 
-    private Vector3 CalculateBlockPosition(BlockData blockData)
+    private GameObject CreateBlock(BlockData blockData, Vector3 localPosition, Transform parent)
     {
-        float x = blockData.x * blockSpacing;
-        float y = blockData.y * blockSpacing;
-        float z = blockData.z * blockSpacing;
-
-        return new Vector3(x, y, z);
-    }
-
-    private GameObject CreateBlock(BlockData blockData, Vector3 position)
-    {
-        if (blockPrefab == null)
-        {
-            Debug.LogError("方块预制体未设置");
-            return null;
-        }
-
-        GameObject block = Instantiate(blockPrefab, _buildingParent.transform);
-        block.transform.localPosition = position;
-
-        BlockController blockController = block.GetComponent<BlockController>();
-        if (blockController == null)
-        {
-            blockController = block.AddComponent<BlockController>();
-        }
-
-        blockController.Initialize(blockData);
-
+        if (blockPrefab == null) { Debug.LogError("方块预制体未设置"); return null; }
+        GameObject block = Instantiate(blockPrefab, parent);
+        block.transform.localPosition = localPosition;
+        BlockController bc = block.GetComponent<BlockController>() ?? block.AddComponent<BlockController>();
+        bc.Initialize(blockData);
         return block;
     }
 
-    public void ClearBuilding()
+    public void ClearBuilding(Vector2Int mapPosition)
     {
-        if (_buildingParent != null)
+        if (_sessions.TryGetValue(mapPosition, out var session))
         {
-            Destroy(_buildingParent);
-            _buildingParent = null;
+            if (session.buildingParent != null) Destroy(session.buildingParent);
+            _sessions.Remove(mapPosition);
         }
+        if (_activeSessionKey == mapPosition)
+        {
+            StopAllCoroutines();
+            _isBuilding = false;
+            _activeSessionKey = null;
+        }
+    }
 
-        _builtBlocks.Clear();
+    public void ClearAllBuildings()
+    {
+        StopAllCoroutines();
+        foreach (var s in _sessions.Values)
+            if (s.buildingParent != null) Destroy(s.buildingParent);
+        _sessions.Clear();
         _isBuilding = false;
+        _activeSessionKey = null;
     }
 
-    public GameObject GetBlockAt(Vector3Int gridPosition)
-    {
-        if (_builtBlocks.ContainsKey(gridPosition))
-        {
-            return _builtBlocks[gridPosition];
-        }
-        return null;
-    }
-
-    public void UpdateBlockColor(Vector3Int gridPosition, Color newColor)
-    {
-        GameObject block = GetBlockAt(gridPosition);
-        if (block != null)
-        {
-            BlockController blockController = block.GetComponent<BlockController>();
-            if (blockController != null)
-            {
-                blockController.SetColor(newColor);
-            }
-        }
-    }
-
-    public bool IsBuilding()
-    {
-        return _isBuilding;
-    }
-
-    public BlueprintData GetCurrentBlueprint()
-    {
-        return _currentBlueprint;
-    }
+    public bool IsBuilding() => _isBuilding;
+    public Vector2Int? GetActiveSessionKey() => _activeSessionKey;
+    public BlueprintData GetCurrentBlueprint() =>
+        _activeSessionKey.HasValue && _sessions.TryGetValue(_activeSessionKey.Value, out var cur)
+            ? cur.blueprint : null;
 }

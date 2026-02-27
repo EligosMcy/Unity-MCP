@@ -1,0 +1,161 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87487bb616f3b4a9151b290e9574fc, type: 3}
+  m_Name: Bridge
+  m_EditorClassIdentifier: Assembly-CSharp::BlueprintData
+  blueprintName: "\u6865\u6881"
+  width: 7
+  height: 2
+  depth: 3
+  blocks:
+  - x: 0
+    y: 0
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 0
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 0
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 0
+    y: 1
+    z: 0
+    materialType: 0
+    color: {r: 0.6, g: 0.4, b: 0.2, a: 1}
+  - x: 0
+    y: 1
+    z: 1
+    materialType: 0
+    color: {r: 0.6, g: 0.4, b: 0.2, a: 1}
+  - x: 0
+    y: 1
+    z: 2
+    materialType: 0
+    color: {r: 0.6, g: 0.4, b: 0.2, a: 1}
+  - x: 1
+    y: 0
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 1
+    y: 0
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 1
+    y: 0
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 0
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 0
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 2
+    y: 0
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 3
+    y: 0
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 3
+    y: 0
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 3
+    y: 0
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 4
+    y: 0
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 4
+    y: 0
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 4
+    y: 0
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 5
+    y: 0
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 5
+    y: 0
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 5
+    y: 0
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 6
+    y: 0
+    z: 0
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 6
+    y: 0
+    z: 1
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 6
+    y: 0
+    z: 2
+    materialType: 1
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - x: 6
+    y: 1
+    z: 0
+    materialType: 0
+    color: {r: 0.6, g: 0.4, b: 0.2, a: 1}
+  - x: 6
+    y: 1
+    z: 1
+    materialType: 0
+    color: {r: 0.6, g: 0.4, b: 0.2, a: 1}
+  - x: 6
+    y: 1
+    z: 2
+    materialType: 0
+    color: {r: 0.6, g: 0.4, b: 0.2, a: 1}
+  materialRequirementList:
+  - materialType: 1
+    amount: 21
+  - materialType: 0
+    amount: 6
+  requiredLevel: {fileID: 0}
+  description: "\u4E00\u5EA7\u8DE8\u8D8A\u6CB3\u6D41\u7684\u6865\u6881"
