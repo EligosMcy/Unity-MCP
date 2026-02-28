@@ -13,6 +13,10 @@ public class BlueprintData : ScriptableObject
     public int Height;
     public int Depth;
 
+    [Header("建造设置")]
+    public float BlockSpacing = 1.0f;
+    public float BuildDelay = 0.1f;
+
     [Header("方块数据")]
     public List<BlockData> Blocks;
 
@@ -59,10 +63,10 @@ public class BlueprintData : ScriptableObject
 
         foreach (var block in Blocks)
         {
-            if (temp.ContainsKey(block.materialType))
-                temp[block.materialType]++;
+            if (temp.ContainsKey(block.MaterialType))
+                temp[block.MaterialType]++;
             else
-                temp[block.materialType] = 1;
+                temp[block.MaterialType] = 1;
         }
 
         foreach (var kv in temp)

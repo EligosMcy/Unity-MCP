@@ -4,18 +4,18 @@ using UnityEngine;
 [Serializable]
 public class BlockData
 {
-    public int x;
-    public int y;
-    public int z;
-    public MaterialType materialType;
-    public Color color;
+    public int X;
+    public int Y;
+    public int Z;
+    public MaterialType MaterialType;
+    public Color Color;
 
     public BlockData(int x, int y, int z, MaterialType materialType, Color color)
     {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.materialType = materialType;
-        this.color = color;
+        X = x;
+        Y = y;
+        Z = z;
+        MaterialType = materialType;
+        Color = color;
     }
 }

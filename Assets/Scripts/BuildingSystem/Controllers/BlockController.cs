@@ -14,7 +14,7 @@ public class BlockController : MonoBehaviour
 
         if (_renderer != null)
         {
-            _renderer.material.color = blockData.color;
+            _renderer.material.color = blockData.Color;
         }
     }
 
@@ -23,7 +23,7 @@ public class BlockController : MonoBehaviour
         if (_renderer != null)
         {
             _renderer.material.color = newColor;
-            _blockData.color = newColor;
+            _blockData.Color = newColor;
         }
     }
 
@@ -49,7 +49,7 @@ public class BlockController : MonoBehaviour
     {
         if (_renderer != null)
         {
-            _renderer.material.color = _blockData.color;
+            _renderer.material.color = _blockData.Color;
         }
     }
 

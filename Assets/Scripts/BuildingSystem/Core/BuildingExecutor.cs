@@ -10,10 +10,6 @@ public class BuildingExecutor : MonoBehaviour
     [Header("方块预制体")]
     public GameObject BlockPrefab;
 
-    [Header("建造设置")]
-    public float blockSpacing = 1.0f;
-    public float buildDelay = 0.1f;
-
     // key: 地图坐标 (x,y)
     private Dictionary<Vector2Int, BuildingSession> _sessions;
     private Vector2Int? _activeSessionKey;
@@ -106,8 +102,8 @@ public class BuildingExecutor : MonoBehaviour
                 isCompleted    = false
             };
             // 计算建筑物中心点偏移量，使建筑物中心点与目标位置对齐
-            float centerOffsetX = (blueprint.Width - 1) * blockSpacing / 2f;
-            float centerOffsetZ = (blueprint.Depth - 1) * blockSpacing / 2f;
+            float centerOffsetX = (blueprint.Width - 1) * blueprint.BlockSpacing / 2f;
+            float centerOffsetZ = (blueprint.Depth - 1) * blueprint.BlockSpacing / 2f;
             Vector3 worldPos = new Vector3(mapPosition.x - centerOffsetX, 0f, mapPosition.y - centerOffsetZ);
             session.buildingParent = new GameObject($"Building_{blueprint.BlueprintName}_{mapPosition.x}_{mapPosition.y}");
             session.buildingParent.transform.position = worldPos;
@@ -129,28 +125,31 @@ public class BuildingExecutor : MonoBehaviour
             BlockData blockData = session.blueprint.Blocks[session.nextBlockIndex];
 
             // 每个方块单独消耗 1 个对应材料
-            if (!MaterialInventory.Instance.ConsumeMaterial(blockData.materialType, 1))
+            if (!MaterialInventory.Instance.ConsumeMaterial(blockData.MaterialType, 1))
             {
                 _isBuilding = false;
                 _activeSessionKey = null;
                 OnBuildingPaused?.Invoke(session.blueprint, session.mapPosition);
-                OnBuildingError?.Invoke($"Insufficient materials: Missing {blockData.materialType}, building paused");
+                OnBuildingError?.Invoke($"Insufficient materials: Missing {blockData.MaterialType}, building paused");
                 yield break;
             }
 
+            // 计算方块的 Y 坐标，使最底层方块的底部与地面平齐
+            // 假设方块的原点在中心，高度为 1 单位
+            float yPos = blockData.Y * session.blueprint.BlockSpacing + 0.5f;
             Vector3 localPos = new Vector3(
-                blockData.x * blockSpacing,
-                blockData.y * blockSpacing,
-                blockData.z * blockSpacing);
+                blockData.X * session.blueprint.BlockSpacing,
+                yPos,
+                blockData.Z * session.blueprint.BlockSpacing);
 
             GameObject block = CreateBlock(blockData, localPos, session.buildingParent.transform);
             if (block != null)
-                session.builtBlocks[new Vector3Int(blockData.x, blockData.y, blockData.z)] = block;
+                session.builtBlocks[new Vector3Int(blockData.X, blockData.Y, blockData.Z)] = block;
 
             session.nextBlockIndex++;
             OnBuildingProgress?.Invoke((float)session.nextBlockIndex / total, session.mapPosition);
 
-            yield return new WaitForSeconds(buildDelay);
+            yield return new WaitForSeconds(session.blueprint.BuildDelay);
         }
 
         session.isCompleted = true;
