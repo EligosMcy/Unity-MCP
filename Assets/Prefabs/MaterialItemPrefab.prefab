@@ -522,9 +522,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc97a80550893a0409c0ced73cbd66d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaterialItemUI
-  materialNameText: {fileID: 5359855473682874593}
-  countText: {fileID: 6361381981986714644}
-  addButton: {fileID: 195116889044642798}
+  MaterialNameText: {fileID: 5359855473682874593}
+  CountText: {fileID: 6361381981986714644}
+  AddButton: {fileID: 195116889044642798}
 --- !u!1 &4685175535088245067
 GameObject:
   m_ObjectHideFlags: 0

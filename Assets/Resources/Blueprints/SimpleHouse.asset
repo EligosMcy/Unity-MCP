@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87487bb616f3b4a9151b290e9574fc, type: 3}
   m_Name: SimpleHouse
   m_EditorClassIdentifier: Assembly-CSharp::BlueprintData
-  blueprintName: Simple House
-  width: 5
-  height: 3
-  depth: 5
-  blocks:
+  BlueprintName: Simple House
+  Width: 5
+  Height: 3
+  Depth: 5
+  Blocks:
   - x: 0
     y: 0
     z: 0
@@ -307,10 +307,10 @@ MonoBehaviour:
     z: 4
     materialType: 0
     color: {r: 1, g: 0.6, b: 0.2, a: 1}
-  materialRequirementList:
+  MaterialRequirementList:
   - materialType: 1
     amount: 25
   - materialType: 0
     amount: 33
-  requiredLevel: {fileID: 0}
-  description: A simple 3x3 house with a roof
+  RequiredLevel: {fileID: 0}
+  Description: A simple 3x3 house with a roof

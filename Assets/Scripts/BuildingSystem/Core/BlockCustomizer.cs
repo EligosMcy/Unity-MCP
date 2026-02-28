@@ -6,7 +6,7 @@ public class BlockCustomizer : MonoBehaviour
     public static BlockCustomizer Instance { get; private set; }
 
     [Header("颜色选择器")]
-    public ColorPickerUI colorPicker;
+    public ColorPickerUI ColorPicker;
 
     private BlockController _selectedBlock;
 
@@ -31,9 +31,9 @@ public class BlockCustomizer : MonoBehaviour
         _selectedBlock = block;
         OnBlockSelected?.Invoke(block);
 
-        if (colorPicker != null)
+        if (ColorPicker != null)
         {
-            colorPicker.Show(block.GetColor());
+            ColorPicker.Show(block.GetColor());
         }
     }
 
@@ -41,9 +41,9 @@ public class BlockCustomizer : MonoBehaviour
     {
         _selectedBlock = null;
 
-        if (colorPicker != null)
+        if (ColorPicker != null)
         {
-            colorPicker.Hide();
+            ColorPicker.Hide();
         }
     }
 

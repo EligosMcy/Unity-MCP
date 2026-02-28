@@ -9,39 +9,40 @@ public class BuildingUI : MonoBehaviour
     public static BuildingUI Instance { get; private set; }
 
     [Header("Blueprint Selection")]
-    public GameObject blueprintPanel;
-    public Transform blueprintListContainer;
-    public GameObject blueprintItemPrefab;
+    public GameObject BlueprintPanel;
+    public Transform BlueprintListContainer;
+    public GameObject BlueprintItemPrefab;
 
     [Header("Material Management")]
-    public GameObject materialPanel;
-    public Transform materialListContainer;
-    public GameObject materialItemPrefab;
+    public GameObject MaterialPanel;
+    public Transform MaterialListContainer;
+    public GameObject MaterialItemPrefab;
+    public Button AddAllMaterialsButton;
 
     [Header("Build Control")]
-    public GameObject buildControlPanel;
-    public Button buildButton;
-    public Button clearButton;
-    public Slider buildProgressSlider;
-    public TextMeshProUGUI buildProgressText;
-    public TextMeshProUGUI blueprintInfoText;
-    public TextMeshProUGUI materialStatusText;
-    public TextMeshProUGUI levelStatusText;
+    public GameObject BuildControlPanel;
+    public Button BuildButton;
+    public Button ClearButton;
+    public Slider BuildProgressSlider;
+    public TextMeshProUGUI BuildProgressText;
+    public TextMeshProUGUI BlueprintInfoText;
+    public TextMeshProUGUI MaterialStatusText;
+    public TextMeshProUGUI LevelStatusText;
 
     [Header("Map Coordinate Input")]
-    public TMP_InputField mapXInput;
-    public TMP_InputField mapYInput;
+    public TMP_InputField MapXInput;
+    public TMP_InputField MapYInput;
 
     [Header("Level Display")]
-    public TextMeshProUGUI woodworkingLevelText;
-    public TextMeshProUGUI constructionLevelText;
-    public Button increaseWoodworkingButton;
-    public Button increaseConstructionButton;
+    public TextMeshProUGUI WoodworkingLevelText;
+    public TextMeshProUGUI ConstructionLevelText;
+    public Button IncreaseWoodworkingButton;
+    public Button IncreaseConstructionButton;
 
     [Header("Error Prompt")]
-    public GameObject errorPanel;
-    public TextMeshProUGUI errorText;
-    public Button errorOkButton;
+    public GameObject ErrorPanel;
+    public TextMeshProUGUI ErrorText;
+    public Button ErrorOkButton;
 
     private BlueprintData _selectedBlueprint;
     private List<BlueprintData> _availableBlueprints;
@@ -66,32 +67,33 @@ public class BuildingUI : MonoBehaviour
 
     private void InitializeUI()
     {
-        buildButton?.onClick.AddListener(OnBuildButtonClicked);
-        clearButton?.onClick.AddListener(OnClearButtonClicked);
-        increaseWoodworkingButton?.onClick.AddListener(OnIncreaseWoodworkingClicked);
-        increaseConstructionButton?.onClick.AddListener(OnIncreaseConstructionClicked);
-        errorOkButton?.onClick.AddListener(HideError);
+        BuildButton?.onClick.AddListener(OnBuildButtonClicked);
+        ClearButton?.onClick.AddListener(OnClearButtonClicked);
+        IncreaseWoodworkingButton?.onClick.AddListener(OnIncreaseWoodworkingClicked);
+        IncreaseConstructionButton?.onClick.AddListener(OnIncreaseConstructionClicked);
+        ErrorOkButton?.onClick.AddListener(HideError);
+        AddAllMaterialsButton?.onClick.AddListener(OnAddAllMaterialsClicked);
 
-        if (errorPanel != null) errorPanel.SetActive(false);
+        if (ErrorPanel != null) ErrorPanel.SetActive(false);
 
         // 坐标输入框初始化
-        if (mapXInput != null)
+        if (MapXInput != null)
         {
-            mapXInput.text = "0";
-            mapXInput.onEndEdit.AddListener(_ => ParseMapPosition());
+            MapXInput.text = "0";
+            MapXInput.onEndEdit.AddListener(_ => ParseMapPosition());
         }
-        if (mapYInput != null)
+        if (MapYInput != null)
         {
-            mapYInput.text = "0";
-            mapYInput.onEndEdit.AddListener(_ => ParseMapPosition());
+            MapYInput.text = "0";
+            MapYInput.onEndEdit.AddListener(_ => ParseMapPosition());
         }
     }
 
     private void ParseMapPosition()
     {
         int x = 0, y = 0;
-        if (mapXInput != null) int.TryParse(mapXInput.text, out x);
-        if (mapYInput != null) int.TryParse(mapYInput.text, out y);
+        if (MapXInput != null) int.TryParse(MapXInput.text, out x);
+        if (MapYInput != null) int.TryParse(MapYInput.text, out y);
         _currentMapPosition = new Vector2Int(x, y);
         UpdateProgressDisplay();
     }
@@ -117,8 +119,8 @@ public class BuildingUI : MonoBehaviour
             BuildingExecutor.Instance.OnBuildingResumed   += OnBuildingResumed;
         }
 
-        if (BlockCustomizer.Instance?.colorPicker != null)
-            BlockCustomizer.Instance.colorPicker.OnColorApplied += OnColorApplied;
+        if (BlockCustomizer.Instance?.ColorPicker != null)
+            BlockCustomizer.Instance.ColorPicker.OnColorApplied += OnColorApplied;
     }
 
     private void LoadBlueprints()
@@ -133,8 +135,8 @@ public class BuildingUI : MonoBehaviour
 
     private void CreateBlueprintItem(BlueprintData blueprint)
     {
-        if (blueprintItemPrefab == null || blueprintListContainer == null) return;
-        var item = Instantiate(blueprintItemPrefab, blueprintListContainer);
+        if (BlueprintItemPrefab == null || BlueprintListContainer == null) return;
+        var item = Instantiate(BlueprintItemPrefab, BlueprintListContainer);
         item.GetComponent<BlueprintItemUI>()?.Initialize(blueprint, OnBlueprintSelected);
     }
 
@@ -151,53 +153,53 @@ public class BuildingUI : MonoBehaviour
 
     private void UpdateBlueprintInfo()
     {
-        if (blueprintInfoText == null || _selectedBlueprint == null) return;
-        blueprintInfoText.text =
-            $"Blueprint: {_selectedBlueprint.blueprintName}\n" +
-            $"Size: {_selectedBlueprint.width}x{_selectedBlueprint.height}x{_selectedBlueprint.depth}\n" +
+        if (BlueprintInfoText == null || _selectedBlueprint == null) return;
+        BlueprintInfoText.text =
+            $"Blueprint: {_selectedBlueprint.BlueprintName}\n" +
+            $"Size: {_selectedBlueprint.Width}x{_selectedBlueprint.Height}x{_selectedBlueprint.Depth}\n" +
             $"Total Blocks: {_selectedBlueprint.GetTotalBlockCount()}\n" +
-            $"Description: {_selectedBlueprint.description}";
+            $"Description: {_selectedBlueprint.Description}";
     }
 
     private void UpdateMaterialStatus()
     {
-        if (materialStatusText == null || _selectedBlueprint == null) return;
+        if (MaterialStatusText == null || _selectedBlueprint == null) return;
 
         string status = "Material Requirements:\n";
-        foreach (var req in _selectedBlueprint.materialRequirements)
+        foreach (var req in _selectedBlueprint.MaterialRequirements)
         {
             int cur = MaterialInventory.Instance.GetMaterialCount(req.Key);
             status += $"{req.Key}: {cur}/{req.Value}";
             if (cur < req.Value) status += " [Insufficient]";
             status += "\n";
         }
-        materialStatusText.text = status;
+        MaterialStatusText.text = status;
     }
 
     private void UpdateLevelStatus()
     {
-        if (levelStatusText == null || _selectedBlueprint == null) return;
-        levelStatusText.text = BuildingLevelManager.Instance.GetLevelRequirementsText(_selectedBlueprint.requiredLevel);
+        if (LevelStatusText == null || _selectedBlueprint == null) return;
+        LevelStatusText.text = BuildingLevelManager.Instance.GetLevelRequirementsText(_selectedBlueprint.RequiredLevel);
     }
 
     private void UpdateMaterialDisplay()
     {
-        if (materialListContainer == null || materialItemPrefab == null) return;
-        foreach (Transform child in materialListContainer) Destroy(child.gameObject);
+        if (MaterialListContainer == null || MaterialItemPrefab == null) return;
+        foreach (Transform child in MaterialListContainer) Destroy(child.gameObject);
 
         foreach (var mat in MaterialInventory.Instance.GetAllMaterials())
         {
-            var item = Instantiate(materialItemPrefab, materialListContainer);
+            var item = Instantiate(MaterialItemPrefab, MaterialListContainer);
             item.GetComponent<MaterialItemUI>()?.Initialize(mat.Key, mat.Value, OnAddMaterialClicked);
         }
     }
 
     private void UpdateLevelDisplay()
     {
-        if (woodworkingLevelText != null)
-            woodworkingLevelText.text = $"Woodworking Level: {BuildingLevelManager.Instance.GetWoodworkingLevel()}";
-        if (constructionLevelText != null)
-            constructionLevelText.text = $"Construction Level: {BuildingLevelManager.Instance.GetConstructionLevel()}";
+        if (WoodworkingLevelText != null)
+            WoodworkingLevelText.text = $"Woodworking Level: {BuildingLevelManager.Instance.GetWoodworkingLevel()}";
+        if (ConstructionLevelText != null)
+            ConstructionLevelText.text = $"Construction Level: {BuildingLevelManager.Instance.GetConstructionLevel()}";
     }
 
     /// 显示当前坐标建造进度（包括未完成的暂停任务）
@@ -210,15 +212,15 @@ public class BuildingUI : MonoBehaviour
 
     private void SetProgressUI(float progress)
     {
-        if (buildProgressSlider != null) buildProgressSlider.value = progress;
-        if (buildProgressText != null)
+        if (BuildProgressSlider != null) BuildProgressSlider.value = progress;
+        if (BuildProgressText != null)
         {
             if (progress <= 0f)
-                buildProgressText.text = "Not Started";
+                BuildProgressText.text = "Not Started";
             else if (progress >= 1f)
-                buildProgressText.text = "Building Complete!";
+                BuildProgressText.text = "Building Complete!";
             else
-                buildProgressText.text = $"Building Progress: {progress * 100:F1}%";
+                BuildProgressText.text = $"Building Progress: {progress * 100:F1}%";
         }
     }
 
@@ -230,14 +232,14 @@ public class BuildingUI : MonoBehaviour
 
     private void OnBuildingStarted(BlueprintData bp, Vector2Int pos)
     {
-        if (pos == _currentMapPosition && buildButton != null)
-            buildButton.interactable = false;
+        if (pos == _currentMapPosition && BuildButton != null)
+            BuildButton.interactable = false;
     }
 
     private void OnBuildingCompleted(BlueprintData bp, Vector2Int pos)
     {
         if (pos != _currentMapPosition) return;
-        if (buildButton != null) buildButton.interactable = true;
+        if (BuildButton != null) BuildButton.interactable = true;
         SetProgressUI(1f);
     }
 
@@ -250,14 +252,14 @@ public class BuildingUI : MonoBehaviour
     {
         // 暂停时恢复按钮可点击，展示当前进度
         if (pos != _currentMapPosition) return;
-        if (buildButton != null) buildButton.interactable = true;
+        if (BuildButton != null) BuildButton.interactable = true;
         UpdateProgressDisplay();
     }
 
     private void OnBuildingResumed(BlueprintData bp, Vector2Int pos)
     {
-        if (pos == _currentMapPosition && buildButton != null)
-            buildButton.interactable = false;
+        if (pos == _currentMapPosition && BuildButton != null)
+            BuildButton.interactable = false;
     }
 
     private void OnBuildingError(string error) => ShowError(error);
@@ -282,17 +284,25 @@ public class BuildingUI : MonoBehaviour
     }
 
     private void OnAddMaterialClicked(MaterialType t) => MaterialInventory.Instance.AddMaterial(t, 10);
+    private void OnAddAllMaterialsClicked()
+    {
+        // 给所有材料类型添加200个
+        foreach (MaterialType materialType in Enum.GetValues(typeof(MaterialType)))
+        {
+            MaterialInventory.Instance.AddMaterial(materialType, 200);
+        }
+    }
     private void OnIncreaseWoodworkingClicked() => BuildingLevelManager.Instance.AddWoodworkingLevel(1);
     private void OnIncreaseConstructionClicked() => BuildingLevelManager.Instance.AddConstructionLevel(1);
 
     private void ShowError(string msg)
     {
-        if (errorText != null) errorText.text = msg;
-        if (errorPanel != null) errorPanel.SetActive(true);
+        if (ErrorText != null) ErrorText.text = msg;
+        if (ErrorPanel != null) ErrorPanel.SetActive(true);
     }
 
     private void HideError()
     {
-        if (errorPanel != null) errorPanel.SetActive(false);
+        if (ErrorPanel != null) ErrorPanel.SetActive(false);
     }
 }

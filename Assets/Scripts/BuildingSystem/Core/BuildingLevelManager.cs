@@ -69,8 +69,8 @@ public class BuildingLevelManager : MonoBehaviour
     {
         if (requiredLevel == null) return true;
         
-        return _woodworkingLevel >= requiredLevel.woodworkingLevel && 
-               _constructionLevel >= requiredLevel.constructionLevel;
+        return _woodworkingLevel >= requiredLevel.WoodworkingLevel && 
+               _constructionLevel >= requiredLevel.ConstructionLevel;
     }
 
     public string GetLevelRequirementsText(BuildingLevelData requiredLevel)
@@ -78,14 +78,14 @@ public class BuildingLevelManager : MonoBehaviour
         if (requiredLevel == null) return "No Level Requirements";
 
         string text = "Level Requirements:\n";
-        text += $"Woodworking Level: {requiredLevel.woodworkingLevel} (Current: {_woodworkingLevel})";
-        if (_woodworkingLevel < requiredLevel.woodworkingLevel)
+        text += $"Woodworking Level: {requiredLevel.WoodworkingLevel} (Current: {_woodworkingLevel})";
+        if (_woodworkingLevel < requiredLevel.WoodworkingLevel)
         {
             text += " [Insufficient]";
         }
         text += "\n";
-        text += $"Construction Level: {requiredLevel.constructionLevel} (Current: {_constructionLevel})";
-        if (_constructionLevel < requiredLevel.constructionLevel)
+        text += $"Construction Level: {requiredLevel.ConstructionLevel} (Current: {_constructionLevel})";
+        if (_constructionLevel < requiredLevel.ConstructionLevel)
         {
             text += " [Insufficient]";
         }

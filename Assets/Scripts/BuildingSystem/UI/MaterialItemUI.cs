@@ -6,9 +6,9 @@ using System;
 public class MaterialItemUI : MonoBehaviour
 {
     [Header("UI元素")]
-    public TextMeshProUGUI materialNameText;
-    public TextMeshProUGUI countText;
-    public Button addButton;
+    public TextMeshProUGUI MaterialNameText;
+    public TextMeshProUGUI CountText;
+    public Button AddButton;
 
     private MaterialType _materialType;
     private Action<MaterialType> _onAddClicked;
@@ -18,19 +18,19 @@ public class MaterialItemUI : MonoBehaviour
         _materialType = materialType;
         _onAddClicked = onAddClicked;
 
-        if (materialNameText != null)
+        if (MaterialNameText != null)
         {
-            materialNameText.text = materialType.ToString();
+            MaterialNameText.text = materialType.ToString();
         }
 
-        if (countText != null)
+        if (CountText != null)
         {
-            countText.text = count.ToString();
+            CountText.text = count.ToString();
         }
 
-        if (addButton != null)
+        if (AddButton != null)
         {
-            addButton.onClick.AddListener(OnAddClicked);
+            AddButton.onClick.AddListener(OnAddClicked);
         }
     }
 
@@ -41,9 +41,9 @@ public class MaterialItemUI : MonoBehaviour
 
     public void UpdateCount(int count)
     {
-        if (countText != null)
+        if (CountText != null)
         {
-            countText.text = count.ToString();
+            CountText.text = count.ToString();
         }
     }
 }

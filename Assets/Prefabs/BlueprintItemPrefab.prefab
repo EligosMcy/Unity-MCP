@@ -49,9 +49,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e75779a3e26e6b46aced8d458750c14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlueprintItemUI
-  nameText: {fileID: 4692666350895252844}
-  sizeText: {fileID: 7150311184607954716}
-  selectButton: {fileID: 2741914758843280713}
+  NameText: {fileID: 4692666350895252844}
+  SizeText: {fileID: 7150311184607954716}
+  SelectButton: {fileID: 2741914758843280713}
 --- !u!1 &2028775713112119517
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,9 +6,9 @@ using System;
 public class BlueprintItemUI : MonoBehaviour
 {
     [Header("UI元素")]
-    public TextMeshProUGUI nameText;
-    public TextMeshProUGUI sizeText;
-    public Button selectButton;
+    public TextMeshProUGUI NameText;
+    public TextMeshProUGUI SizeText;
+    public Button SelectButton;
 
     private BlueprintData _blueprint;
     private Action<BlueprintData> _onSelected;
@@ -18,19 +18,19 @@ public class BlueprintItemUI : MonoBehaviour
         _blueprint = blueprint;
         _onSelected = onSelected;
 
-        if (nameText != null)
+        if (NameText != null)
         {
-            nameText.text = blueprint.blueprintName;
+            NameText.text = blueprint.BlueprintName;
         }
 
-        if (sizeText != null)
+        if (SizeText != null)
         {
-            sizeText.text = $"{blueprint.width}x{blueprint.height}x{blueprint.depth}";
+            SizeText.text = $"{blueprint.Width}x{blueprint.Height}x{blueprint.Depth}";
         }
 
-        if (selectButton != null)
+        if (SelectButton != null)
         {
-            selectButton.onClick.AddListener(OnSelectClicked);
+            SelectButton.onClick.AddListener(OnSelectClicked);
         }
     }
 

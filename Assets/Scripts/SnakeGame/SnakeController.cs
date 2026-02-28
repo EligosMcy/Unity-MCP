@@ -82,8 +82,8 @@ public class SnakeController : MonoBehaviour
 
         if (_gameSetting != null)
         {
-            _boundary = _gameSetting.boundary;
-            _moveInterval = _gameSetting.moveInterval;
+            _boundary = _gameSetting.Boundary;
+            _moveInterval = _gameSetting.MoveInterval;
 
             // 更新自动寻路组件的边界值
             if (_autoPathfinding != null)
@@ -167,6 +167,8 @@ public class SnakeController : MonoBehaviour
                 _uiManager.ShowGameOverText(true, _score);
                 // 暂停游戏
                 Time.timeScale = 0;
+                // 重置食物计数
+                _foodManager.ResetFoodCount();
                 break;
         }
     }
@@ -237,7 +239,7 @@ public class SnakeController : MonoBehaviour
 
             // 更新移动
             _moveTimer += Time.deltaTime;
-            if (_moveTimer >= _gameSetting.moveInterval)
+            if (_moveTimer >= _gameSetting.MoveInterval)
             {
                 Move();
                 _moveTimer = 0.0f;
@@ -395,7 +397,7 @@ public class SnakeController : MonoBehaviour
         // 启动身体变色动画
         if (_bodyManager != null)
         {
-            _bodyManager.StartColorChangeAnimation(_gameSetting.targetColor);
+            _bodyManager.StartColorChangeAnimation(_gameSetting.TargetColor);
         }
 
         // 销毁当前食物并重新生成
@@ -416,7 +418,7 @@ public class SnakeController : MonoBehaviour
         // 启动身体变色动画（大食物使用特殊颜色）
         if (_bodyManager != null)
         {
-            _bodyManager.StartColorChangeAnimation(_gameSetting.targetColor);
+            _bodyManager.StartColorChangeAnimation(_gameSetting.TargetColor);
         }
 
         // 销毁当前大食物并重新生成

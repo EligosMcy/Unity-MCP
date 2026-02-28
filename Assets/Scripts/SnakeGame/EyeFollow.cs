@@ -14,7 +14,7 @@ public class EyeFollow : MonoBehaviour
     private Transform _rightEye; // 右眼 transform
     
     [SerializeField]
-    private float _eyeRotationSpeed = 5f; // 眼睛旋转速度
+    private float _eyeRotationDuration = 0.2f; // 眼睛旋转速度
     
     private Vector3 _lastPosition; // 上一帧位置
     private Vector3 _moveDirection; // 移动方向
@@ -50,12 +50,12 @@ public class EyeFollow : MonoBehaviour
         // 使用 DOTween 平滑旋转眼睛
         if (_leftEye != null)
         {
-            _leftEye.DORotate(targetRotation.eulerAngles, 0.2f).SetEase(Ease.OutQuad);
+            _leftEye.DORotate(targetRotation.eulerAngles, _eyeRotationDuration).SetEase(Ease.OutQuad);
         }
         
         if (_rightEye != null)
         {
-            _rightEye.DORotate(targetRotation.eulerAngles, 0.2f).SetEase(Ease.OutQuad);
+            _rightEye.DORotate(targetRotation.eulerAngles, _eyeRotationDuration).SetEase(Ease.OutQuad);
         }
     }
 }

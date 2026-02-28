@@ -32,9 +32,9 @@ public class FoodManager : MonoBehaviour
         
         if (_gameSetting != null)
         {
-            _foodPrefab = _gameSetting.foodPrefab;
-            _bigFoodPrefab = _gameSetting.bigFoodPrefab;
-            _boundary = _gameSetting.boundary;
+            _foodPrefab = _gameSetting.FoodPrefab;
+            _bigFoodPrefab = _gameSetting.BigFoodPrefab;
+            _boundary = _gameSetting.Boundary;
         }
     }
 
@@ -79,14 +79,14 @@ public class FoodManager : MonoBehaviour
             {
                 _food = Instantiate(_foodPrefab);
                 _food.name = "Food";
-                _food.tag = _gameSetting.foodTag;
+                _food.tag = _gameSetting.FoodTag;
             }
             else
             {
                 // 如果预制体未设置，使用默认球体
                 _food = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 _food.name = "Food";
-                _food.tag = _gameSetting.foodTag;
+                _food.tag = _gameSetting.FoodTag;
                 _food.transform.localScale = new Vector3(1, 1, 1);
 
                 // 为食物设置FoodMaterial材质
@@ -152,14 +152,14 @@ public class FoodManager : MonoBehaviour
             {
                 _bigFood = Instantiate(_bigFoodPrefab);
                 _bigFood.name = "BigFood";
-                _bigFood.tag = _gameSetting.bigFoodTag;
+                _bigFood.tag = _gameSetting.BigFoodTag;
             }
             else
             {
                 // 如果预制体未设置，使用默认球体
                 _bigFood = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 _bigFood.name = "BigFood";
-                _bigFood.tag = _gameSetting.bigFoodTag;
+                _bigFood.tag = _gameSetting.BigFoodTag;
                 _bigFood.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
 
                 // 为大食物设置不同的材质
@@ -280,16 +280,21 @@ public class FoodManager : MonoBehaviour
 
     public int GetSmallFoodScore()
     {
-        return _gameSetting != null ? _gameSetting.smallFoodScore : 1;
+        return _gameSetting != null ? _gameSetting.SmallFoodScore : 1;
     }
 
     public int GetBigFoodScore()
     {
-        return _gameSetting != null ? _gameSetting.bigFoodScore : 5;
+        return _gameSetting != null ? _gameSetting.BigFoodScore : 5;
     }
 
     public void UpdateBodyPartsReference(System.Collections.Generic.List<GameObject> bodyParts)
     {
         _bodyParts = bodyParts;
+    }
+
+    public void ResetFoodCount()
+    {
+        _foodCount = 0;
     }
 }

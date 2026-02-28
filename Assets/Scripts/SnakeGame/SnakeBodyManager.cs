@@ -31,8 +31,8 @@ public class SnakeBodyManager : MonoBehaviour
     {
         _gameSetting = gameSetting;
         _head = head;
-        _bodyPrefab = _gameSetting.bodyPrefab;
-        _boundary = _gameSetting.boundary;
+        _bodyPrefab = _gameSetting.BodyPrefab;
+        _boundary = _gameSetting.Boundary;
 
         // 初始化身体
         ResetBody();
@@ -81,7 +81,7 @@ public class SnakeBodyManager : MonoBehaviour
             }
         }
         body1.name = "Body1";
-        body1.tag = _gameSetting.bodyTag;
+        body1.tag = _gameSetting.BodyTag;
         body1.transform.localPosition = new Vector3(-1, 0, 0);
 
         _bodyParts.Add(body1);
@@ -114,7 +114,7 @@ public class SnakeBodyManager : MonoBehaviour
             }
         }
         newBodyPart.name = "Body" + (_bodyParts.Count + 1);
-        newBodyPart.tag = _gameSetting.bodyTag;
+        newBodyPart.tag = _gameSetting.BodyTag;
         newBodyPart.transform.localPosition = position;
 
         _bodyParts.Add(newBodyPart);
@@ -166,7 +166,7 @@ public class SnakeBodyManager : MonoBehaviour
             return;
 
         // 计算需要逐渐变小的身体段数量
-        int shrinkCount = Mathf.Max(1, Mathf.FloorToInt((_gameSetting.maxBodySize - _gameSetting.minBodySize) / _gameSetting.sizeDecrement) + 1);
+        int shrinkCount = Mathf.Max(1, Mathf.FloorToInt((_gameSetting.MaxBodySize - _gameSetting.MinBodySize) / _gameSetting.SizeDecrement) + 1);
         shrinkCount = Mathf.Min(shrinkCount, bodyCount);
 
         // 从头部开始往后逐渐变小
@@ -178,15 +178,16 @@ public class SnakeBodyManager : MonoBehaviour
                 if (i < shrinkCount)
                 {
                     // 逐渐变小
-                    float scaleFactor = _gameSetting.maxBodySize - (i * _gameSetting.sizeDecrement);
+                    float scaleFactor = _gameSetting.MaxBodySize - (i * _gameSetting.SizeDecrement);
+
                     // 确保不小于最小尺寸
-                    scaleFactor = Mathf.Max(scaleFactor, _gameSetting.minBodySize);
+                    scaleFactor = Mathf.Max(scaleFactor, _gameSetting.MinBodySize);
                     bodyPart.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
                 }
                 else
                 {
                     // 最小大小
-                    bodyPart.transform.localScale = new Vector3(_gameSetting.minBodySize, _gameSetting.minBodySize, _gameSetting.minBodySize);
+                    bodyPart.transform.localScale = new Vector3(_gameSetting.MinBodySize, _gameSetting.MinBodySize, _gameSetting.MinBodySize);
                 }
             }
         }
@@ -205,7 +206,7 @@ public class SnakeBodyManager : MonoBehaviour
     private IEnumerator ColorChangeAnimationCoroutine()
     {
         // 计算每个身体段的变色间隔
-        float colorChangeInterval = _gameSetting.colorChangeDuration / (_bodyParts.Count * 2); // 每个身体段有变色和还原两个步骤
+        float colorChangeInterval = _gameSetting.ColorChangeDuration / (_bodyParts.Count * 2); // 每个身体段有变色和还原两个步骤
 
         // 为每个身体段依次变色
         for (int i = 0; i < _bodyParts.Count; i++)
@@ -232,7 +233,7 @@ public class SnakeBodyManager : MonoBehaviour
                 if (renderer != null)
                 {
                     // 使用 DOTween 实现平滑颜色过渡
-                    renderer.material.DOColor(_gameSetting.originalColor, colorChangeInterval);
+                    renderer.material.DOColor(_gameSetting.OriginalColor, colorChangeInterval);
                 }
             }
 
@@ -255,7 +256,7 @@ public class SnakeBodyManager : MonoBehaviour
                     Renderer renderer = newBodyPart.GetComponent<Renderer>();
                     if (renderer != null)
                     {
-                        renderer.material.color = _gameSetting.originalColor;
+                        renderer.material.color = _gameSetting.OriginalColor;
                     }
                 }
             }

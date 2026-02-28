@@ -47,25 +47,12 @@ public class PathfindingVisualizer : MonoBehaviour
         GameSettingScriptableObject gameSetting = Resources.Load<GameSettingScriptableObject>("GameSettings/DefaultGameSetting");
         if (gameSetting != null)
         {
-            _boundary = gameSetting.boundary;
+            _boundary = gameSetting.Boundary;
         }
     }
 
     private void Start()
     {
-        // 如果没有手动分配引用，尝试自动查找
-        if (_autoPathfinding == null)
-        {
-            _autoPathfinding = FindObjectOfType<AutoPathfinding>();
-        }
-        if (_foodManager == null)
-        {
-            _foodManager = FindObjectOfType<FoodManager>();
-        }
-        if (_snakeController == null)
-        {
-            _snakeController = FindObjectOfType<SnakeController>();
-        }
     }
 
     private void Update()

@@ -6,30 +6,30 @@ using UnityEngine;
 public class BlueprintData : ScriptableObject
 {
     [Header("蓝图信息")]
-    public string blueprintName;
+    public string BlueprintName;
 
     [Header("区域大小")]
-    public int width;
-    public int height;
-    public int depth;
+    public int Width;
+    public int Height;
+    public int Depth;
 
     [Header("方块数据")]
-    public List<BlockData> blocks;
+    public List<BlockData> Blocks;
 
     [Header("材料需求统计（可序列化）")]
-    public List<MaterialRequirementEntry> materialRequirementList = new List<MaterialRequirementEntry>();
+    public List<MaterialRequirementEntry> MaterialRequirementList = new List<MaterialRequirementEntry>();
 
     [Header("建筑等级要求")]
-    public BuildingLevelData requiredLevel;
+    public BuildingLevelData RequiredLevel;
 
     [Header("描述")]
     [TextArea]
-    public string description;
+    public string Description;
 
-    // 运行时缓存，由 materialRequirementList 构建
+    // 运行时缓存，由 MaterialRequirementList 构建
     private Dictionary<MaterialType, int> _materialRequirementsCache;
 
-    public Dictionary<MaterialType, int> materialRequirements
+    public Dictionary<MaterialType, int> MaterialRequirements
     {
         get
         {
@@ -47,17 +47,17 @@ public class BlueprintData : ScriptableObject
     private void RebuildCache()
     {
         _materialRequirementsCache = new Dictionary<MaterialType, int>();
-        if (materialRequirementList == null) return;
-        foreach (var entry in materialRequirementList)
+        if (MaterialRequirementList == null) return;
+        foreach (var entry in MaterialRequirementList)
             _materialRequirementsCache[entry.materialType] = entry.amount;
     }
 
     public void CalculateMaterialRequirements()
     {
-        materialRequirementList = new List<MaterialRequirementEntry>();
+        MaterialRequirementList = new List<MaterialRequirementEntry>();
         var temp = new Dictionary<MaterialType, int>();
 
-        foreach (var block in blocks)
+        foreach (var block in Blocks)
         {
             if (temp.ContainsKey(block.materialType))
                 temp[block.materialType]++;
@@ -66,19 +66,19 @@ public class BlueprintData : ScriptableObject
         }
 
         foreach (var kv in temp)
-            materialRequirementList.Add(new MaterialRequirementEntry { materialType = kv.Key, amount = kv.Value });
+            MaterialRequirementList.Add(new MaterialRequirementEntry { materialType = kv.Key, amount = kv.Value });
 
         RebuildCache();
     }
 
     public int GetTotalBlockCount()
     {
-        return blocks != null ? blocks.Count : 0;
+        return Blocks != null ? Blocks.Count : 0;
     }
 
     public int GetMaterialRequirement(MaterialType materialType)
     {
-        if (materialRequirements.TryGetValue(materialType, out int amount))
+        if (MaterialRequirements.TryGetValue(materialType, out int amount))
             return amount;
         return 0;
     }

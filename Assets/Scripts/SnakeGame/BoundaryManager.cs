@@ -27,9 +27,9 @@ public class BoundaryManager : MonoBehaviour
             return;
         }
         
-        float boundarySize = _gameSetting.boundary;
-        GameObject boundaryPrefab = _gameSetting.boundaryPrefab;
-        string boundaryTag = _gameSetting.boundaryTag;
+        float boundarySize = _gameSetting.Boundary;
+        GameObject boundaryPrefab = _gameSetting.BoundaryPrefab;
+        string boundaryTag = _gameSetting.BoundaryTag;
         
         if (boundaryPrefab == null)
         {

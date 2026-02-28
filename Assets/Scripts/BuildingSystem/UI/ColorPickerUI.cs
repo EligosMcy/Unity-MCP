@@ -5,13 +5,13 @@ using UnityEngine.Events;
 public class ColorPickerUI : MonoBehaviour
 {
     [Header("UI元素")]
-    public GameObject panel;
-    public Image previewImage;
-    public Slider redSlider;
-    public Slider greenSlider;
-    public Slider blueSlider;
-    public Button applyButton;
-    public Button cancelButton;
+    public GameObject Panel;
+    public Image PreviewImage;
+    public Slider RedSlider;
+    public Slider GreenSlider;
+    public Slider BlueSlider;
+    public Button ApplyButton;
+    public Button CancelButton;
 
     private Color _currentColor;
 
@@ -19,34 +19,34 @@ public class ColorPickerUI : MonoBehaviour
 
     private void Awake()
     {
-        if (panel != null)
+        if (Panel != null)
         {
-            panel.SetActive(false);
+            Panel.SetActive(false);
         }
 
-        if (redSlider != null)
+        if (RedSlider != null)
         {
-            redSlider.onValueChanged.AddListener(UpdateColor);
+            RedSlider.onValueChanged.AddListener(UpdateColor);
         }
 
-        if (greenSlider != null)
+        if (GreenSlider != null)
         {
-            greenSlider.onValueChanged.AddListener(UpdateColor);
+            GreenSlider.onValueChanged.AddListener(UpdateColor);
         }
 
-        if (blueSlider != null)
+        if (BlueSlider != null)
         {
-            blueSlider.onValueChanged.AddListener(UpdateColor);
+            BlueSlider.onValueChanged.AddListener(UpdateColor);
         }
 
-        if (applyButton != null)
+        if (ApplyButton != null)
         {
-            applyButton.onClick.AddListener(Apply);
+            ApplyButton.onClick.AddListener(Apply);
         }
 
-        if (cancelButton != null)
+        if (CancelButton != null)
         {
-            cancelButton.onClick.AddListener(Cancel);
+            CancelButton.onClick.AddListener(Cancel);
         }
     }
 
@@ -54,9 +54,9 @@ public class ColorPickerUI : MonoBehaviour
     {
         _currentColor = initialColor;
 
-        if (panel != null)
+        if (Panel != null)
         {
-            panel.SetActive(true);
+            Panel.SetActive(true);
         }
 
         UpdateSliders();
@@ -65,44 +65,44 @@ public class ColorPickerUI : MonoBehaviour
 
     public void Hide()
     {
-        if (panel != null)
+        if (Panel != null)
         {
-            panel.SetActive(false);
+            Panel.SetActive(false);
         }
     }
 
     private void UpdateSliders()
     {
-        if (redSlider != null)
+        if (RedSlider != null)
         {
-            redSlider.value = _currentColor.r;
+            RedSlider.value = _currentColor.r;
         }
 
-        if (greenSlider != null)
+        if (GreenSlider != null)
         {
-            greenSlider.value = _currentColor.g;
+            GreenSlider.value = _currentColor.g;
         }
 
-        if (blueSlider != null)
+        if (BlueSlider != null)
         {
-            blueSlider.value = _currentColor.b;
+            BlueSlider.value = _currentColor.b;
         }
     }
 
     private void UpdateColor(float value)
     {
-        if (redSlider != null && greenSlider != null && blueSlider != null)
+        if (RedSlider != null && GreenSlider != null && BlueSlider != null)
         {
-            _currentColor = new Color(redSlider.value, greenSlider.value, blueSlider.value);
+            _currentColor = new Color(RedSlider.value, GreenSlider.value, BlueSlider.value);
             UpdatePreview();
         }
     }
 
     private void UpdatePreview()
     {
-        if (previewImage != null)
+        if (PreviewImage != null)
         {
-            previewImage.color = _currentColor;
+            PreviewImage.color = _currentColor;
         }
     }
 

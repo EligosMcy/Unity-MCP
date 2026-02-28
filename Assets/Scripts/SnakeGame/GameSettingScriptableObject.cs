@@ -6,65 +6,65 @@ public class GameSettingScriptableObject : ScriptableObject
     [Header("游戏设置")]
     [Range(0.02f, 0.5f)]
     [Tooltip("移动间隔")]
-    public float moveInterval = 0.2f;
+    public float MoveInterval = 0.2f;
 
     [Range(1, 10)]
     [Tooltip("游戏边界")]
-    public int boundary = 4;
+    public int Boundary = 4;
 
     [Header("预制体设置")]
     [Tooltip("蛇身预制体")]
-    public GameObject bodyPrefab;
+    public GameObject BodyPrefab;
 
     [Tooltip("食物预制体")]
-    public GameObject foodPrefab;
+    public GameObject FoodPrefab;
 
     [Tooltip("大食物预制体")]
-    public GameObject bigFoodPrefab;
+    public GameObject BigFoodPrefab;
 
     [Tooltip("边界预制体")]
-    public GameObject boundaryPrefab;
+    public GameObject BoundaryPrefab;
 
     [Header("蛇身设置")]
     [Range(0.5f, 2.0f)]
     [Tooltip("最大身体尺寸（第一个身体）")]
-    public float maxBodySize = 0.8f;
+    public float MaxBodySize = 0.8f;
 
     [Range(0.01f, 0.5f)]
     [Tooltip("尺寸变化间隔")]
-    public float sizeDecrement = 0.1f;
+    public float SizeDecrement = 0.1f;
 
     [Range(0.1f, 1.0f)]
     [Tooltip("最小身体尺寸")]
-    public float minBodySize = 0.4f;
+    public float MinBodySize = 0.4f;
 
     [Header("分数设置")]
     [Tooltip("小食物分数")]
-    public int smallFoodScore = 1;
+    public int SmallFoodScore = 1;
 
     [Tooltip("大食物分数")]
-    public int bigFoodScore = 5;
+    public int BigFoodScore = 5;
 
     [Header("标签设置")]
     [Tooltip("边界标签")]
-    public string boundaryTag = "Boundary";
+    public string BoundaryTag = "Boundary";
 
     [Tooltip("食物标签")]
-    public string foodTag = "Food";
+    public string FoodTag = "Food";
 
-    public string bigFoodTag = "BigFood";
+    public string BigFoodTag = "BigFood";
 
     [Tooltip("蛇身标签")]
-    public string bodyTag = "Body";
+    public string BodyTag = "Body";
 
     [Header("动画设置")]
     [Range(0.1f, 1.0f)]
     [Tooltip("身体变色动画持续时间")]
-    public float colorChangeDuration = 0.2f;
+    public float ColorChangeDuration = 0.2f;
 
     [Tooltip("变色目标颜色")]
-    public Color targetColor = Color.yellow;
+    public Color TargetColor = Color.yellow;
 
     [Tooltip("原始身体颜色")]
-    public Color originalColor = Color.white;
+    public Color OriginalColor = Color.white;
 }

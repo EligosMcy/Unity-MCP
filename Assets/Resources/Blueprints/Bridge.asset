@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87487bb616f3b4a9151b290e9574fc, type: 3}
   m_Name: Bridge
   m_EditorClassIdentifier: Assembly-CSharp::BlueprintData
-  blueprintName: Bridge
-  width: 7
-  height: 2
-  depth: 3
-  blocks:
+  BlueprintName: Bridge
+  Width: 7
+  Height: 2
+  Depth: 3
+  Blocks:
   - x: 0
     y: 0
     z: 0
@@ -152,10 +152,10 @@ MonoBehaviour:
     z: 2
     materialType: 0
     color: {r: 1, g: 0.4, b: 0.8, a: 1}
-  materialRequirementList:
+  MaterialRequirementList:
   - materialType: 1
     amount: 21
   - materialType: 0
     amount: 6
-  requiredLevel: {fileID: 0}
-  description: A bridge across a river
+  RequiredLevel: {fileID: 0}
+  Description: A bridge across a river

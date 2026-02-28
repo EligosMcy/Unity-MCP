@@ -8,7 +8,7 @@ public class BuildingExecutor : MonoBehaviour
     public static BuildingExecutor Instance { get; private set; }
 
     [Header("方块预制体")]
-    public GameObject blockPrefab;
+    public GameObject BlockPrefab;
 
     [Header("建造设置")]
     public float blockSpacing = 1.0f;
@@ -57,7 +57,7 @@ public class BuildingExecutor : MonoBehaviour
             OnBuildingError?.Invoke("Blueprint data is null");
             return false;
         }
-        if (!BuildingLevelManager.Instance.CanBuildWithLevel(blueprint.requiredLevel))
+        if (!BuildingLevelManager.Instance.CanBuildWithLevel(blueprint.RequiredLevel))
         {
             OnBuildingError?.Invoke("Insufficient level to build");
             return false;
@@ -73,8 +73,8 @@ public class BuildingExecutor : MonoBehaviour
     public float GetSessionProgress(Vector2Int mapPosition)
     {
         if (!_sessions.TryGetValue(mapPosition, out var s)) return 0f;
-        if (s.blueprint.blocks.Count == 0) return 0f;
-        return (float)s.nextBlockIndex / s.blueprint.blocks.Count;
+        if (s.blueprint.Blocks.Count == 0) return 0f;
+        return (float)s.nextBlockIndex / s.blueprint.Blocks.Count;
     }
 
     /// <summary>
@@ -105,8 +105,11 @@ public class BuildingExecutor : MonoBehaviour
                 nextBlockIndex = 0,
                 isCompleted    = false
             };
-            Vector3 worldPos = new Vector3(mapPosition.x, 0f, mapPosition.y);
-            session.buildingParent = new GameObject($"Building_{blueprint.blueprintName}_{mapPosition.x}_{mapPosition.y}");
+            // 计算建筑物中心点偏移量，使建筑物中心点与目标位置对齐
+            float centerOffsetX = (blueprint.Width - 1) * blockSpacing / 2f;
+            float centerOffsetZ = (blueprint.Depth - 1) * blockSpacing / 2f;
+            Vector3 worldPos = new Vector3(mapPosition.x - centerOffsetX, 0f, mapPosition.y - centerOffsetZ);
+            session.buildingParent = new GameObject($"Building_{blueprint.BlueprintName}_{mapPosition.x}_{mapPosition.y}");
             session.buildingParent.transform.position = worldPos;
             _sessions[mapPosition] = session;
             OnBuildingStarted?.Invoke(blueprint, mapPosition);
@@ -119,11 +122,11 @@ public class BuildingExecutor : MonoBehaviour
 
     private IEnumerator BuildCoroutine(BuildingSession session)
     {
-        int total = session.blueprint.blocks.Count;
+        int total = session.blueprint.Blocks.Count;
 
         while (session.nextBlockIndex < total)
         {
-            BlockData blockData = session.blueprint.blocks[session.nextBlockIndex];
+            BlockData blockData = session.blueprint.Blocks[session.nextBlockIndex];
 
             // 每个方块单独消耗 1 个对应材料
             if (!MaterialInventory.Instance.ConsumeMaterial(blockData.materialType, 1))
@@ -158,8 +161,8 @@ public class BuildingExecutor : MonoBehaviour
 
     private GameObject CreateBlock(BlockData blockData, Vector3 localPosition, Transform parent)
     {
-        if (blockPrefab == null) { Debug.LogError("方块预制体未设置"); return null; }
-        GameObject block = Instantiate(blockPrefab, parent);
+        if (BlockPrefab == null) { Debug.LogError("方块预制体未设置"); return null; }
+        GameObject block = Instantiate(BlockPrefab, parent);
         block.transform.localPosition = localPosition;
         BlockController bc = block.GetComponent<BlockController>() ?? block.AddComponent<BlockController>();
         bc.Initialize(blockData);
