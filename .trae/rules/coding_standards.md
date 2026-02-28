@@ -83,3 +83,7 @@ if (collision != null && collision.gameObject.CompareTag("Obstacle"))
 ```csharp
 public int Score { get; private set; }
 ```
+
+### 输入系统
+- 只使用新版的InputSystem，不要使用旧版的InputManager
+- 示例：使用 `InputSystem` 命名空间和相关API进行输入处理

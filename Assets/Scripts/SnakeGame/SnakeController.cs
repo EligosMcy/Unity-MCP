@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using DG.Tweening;
@@ -10,6 +11,9 @@ public class SnakeController : MonoBehaviour
 
     // 当前游戏状态
     private GameState _currentState = GameState.Start;
+
+    // 游戏结束事件，参数为最终得分
+    public event Action<int> OnGameOver;
 
     [SerializeField]
     private GameSettingScriptableObject _gameSetting;
@@ -57,10 +61,25 @@ public class SnakeController : MonoBehaviour
     // 游戏是否结束
     private bool _gameOver = false;
 
+    // 游戏结束属性，用于监控状态变化
+    public bool IsGameOver
+    {
+        get => _gameOver;
+        private set
+        {
+            if (_gameOver != value)
+            {
+                _gameOver = value;
+                OnGameOverChanged?.Invoke(_gameOver);
+            }
+        }
+    }
+
+    // 游戏结束状态改变事件
+    public event Action<bool> OnGameOverChanged;
+
     // 游戏结束标志（防止重复触发）
     private bool _isGameOverCalled = false;
-
-
 
     // 得分
     private int _score = 0;
@@ -178,6 +197,7 @@ public class SnakeController : MonoBehaviour
     {
         // 重置游戏结束标志
         _isGameOverCalled = false;
+        IsGameOver = false;
 
         // 取消所有挂起的 Invoke 调用
         CancelInvoke("StartGame");
@@ -436,8 +456,11 @@ public class SnakeController : MonoBehaviour
             return;
 
         _isGameOverCalled = true;
-        _gameOver = true;
+        IsGameOver = true;
         Debug.Log("Game Over! Score: " + _score);
+
+        // 触发游戏结束事件
+        OnGameOver?.Invoke(_score);
 
         // 如果是自动模式，记录统计信息并自动重新开始
         if (_autoMode)

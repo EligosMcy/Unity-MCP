@@ -19,6 +19,42 @@ public class ColorPickerUI : MonoBehaviour
 
     private void Awake()
     {
+        // 自动查找UI元素
+        if (Panel == null)
+        {
+            Panel = transform.parent.gameObject;
+        }
+
+        if (PreviewImage == null)
+        {
+            PreviewImage = transform.parent.Find("PreviewImage").GetComponent<Image>();
+        }
+
+        if (RedSlider == null)
+        {
+            RedSlider = transform.parent.Find("RedSlider").GetComponent<Slider>();
+        }
+
+        if (GreenSlider == null)
+        {
+            GreenSlider = transform.parent.Find("GreenSlider").GetComponent<Slider>();
+        }
+
+        if (BlueSlider == null)
+        {
+            BlueSlider = transform.parent.Find("BlueSlider").GetComponent<Slider>();
+        }
+
+        if (ApplyButton == null)
+        {
+            ApplyButton = transform.parent.Find("ApplyButton").GetComponent<Button>();
+        }
+
+        if (CancelButton == null)
+        {
+            CancelButton = transform.parent.Find("CancelButton").GetComponent<Button>();
+        }
+
         if (Panel != null)
         {
             Panel.SetActive(false);
@@ -26,17 +62,17 @@ public class ColorPickerUI : MonoBehaviour
 
         if (RedSlider != null)
         {
-            RedSlider.onValueChanged.AddListener(UpdateColor);
+            RedSlider.onValueChanged.AddListener(updateColor);
         }
 
         if (GreenSlider != null)
         {
-            GreenSlider.onValueChanged.AddListener(UpdateColor);
+            GreenSlider.onValueChanged.AddListener(updateColor);
         }
 
         if (BlueSlider != null)
         {
-            BlueSlider.onValueChanged.AddListener(UpdateColor);
+            BlueSlider.onValueChanged.AddListener(updateColor);
         }
 
         if (ApplyButton != null)
@@ -50,17 +86,19 @@ public class ColorPickerUI : MonoBehaviour
         }
     }
 
-    public void Show(Color initialColor)
+    public void Show()
     {
-        _currentColor = initialColor;
-
         if (Panel != null)
         {
             Panel.SetActive(true);
         }
+    }
 
-        UpdateSliders();
-        UpdatePreview();
+    public void SetInitialColor(Color initialColor)
+    {
+        _currentColor = initialColor;
+        updateSliders();
+        updatePreview();
     }
 
     public void Hide()
@@ -71,7 +109,7 @@ public class ColorPickerUI : MonoBehaviour
         }
     }
 
-    private void UpdateSliders()
+    private void updateSliders()
     {
         if (RedSlider != null)
         {
@@ -89,16 +127,16 @@ public class ColorPickerUI : MonoBehaviour
         }
     }
 
-    private void UpdateColor(float value)
+    private void updateColor(float value)
     {
         if (RedSlider != null && GreenSlider != null && BlueSlider != null)
         {
             _currentColor = new Color(RedSlider.value, GreenSlider.value, BlueSlider.value);
-            UpdatePreview();
+            updatePreview();
         }
     }
 
-    private void UpdatePreview()
+    private void updatePreview()
     {
         if (PreviewImage != null)
         {
@@ -109,11 +147,9 @@ public class ColorPickerUI : MonoBehaviour
     private void Apply()
     {
         OnColorApplied?.Invoke(_currentColor);
-        Hide();
     }
 
     private void Cancel()
     {
-        Hide();
     }
 }

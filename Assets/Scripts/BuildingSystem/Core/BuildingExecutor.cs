@@ -163,6 +163,13 @@ public class BuildingExecutor : MonoBehaviour
         if (BlockPrefab == null) { Debug.LogError("方块预制体未设置"); return null; }
         GameObject block = Instantiate(BlockPrefab, parent);
         block.transform.localPosition = localPosition;
+        
+        // 确保方块有Collider组件，以便触发鼠标事件
+        if (block.GetComponent<Collider>() == null)
+        {
+            block.AddComponent<BoxCollider>();
+        }
+        
         BlockController bc = block.GetComponent<BlockController>() ?? block.AddComponent<BlockController>();
         bc.Initialize(blockData);
         return block;

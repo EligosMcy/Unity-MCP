@@ -26,6 +26,31 @@ public class BlockCustomizer : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if (BlockSelector.Instance != null)
+        {
+            BlockSelector.Instance.OnBlockClick += HandleBlockClick;
+        }
+        else
+        {
+            Debug.LogWarning("BlockCustomizer: BlockSelector.Instance is null!");
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (BlockSelector.Instance != null)
+        {
+            BlockSelector.Instance.OnBlockClick -= HandleBlockClick;
+        }
+    }
+
+    private void HandleBlockClick(BlockController block)
+    {
+        SelectBlock(block);
+    }
+
     public void SelectBlock(BlockController block)
     {
         _selectedBlock = block;
@@ -33,7 +58,7 @@ public class BlockCustomizer : MonoBehaviour
 
         if (ColorPicker != null)
         {
-            ColorPicker.Show(block.GetColor());
+            ColorPicker.SetInitialColor(block.GetColor());
         }
     }
 

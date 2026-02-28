@@ -486,7 +486,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3348,6 +3348,27 @@ MonoBehaviour:
   ErrorPanel: {fileID: 981814680}
   ErrorText: {fileID: 199213387}
   ErrorOkButton: {fileID: 31437005}
+  ModeSwitchInputActionProperty:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Mode Switch Input Action Property
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 9dd54e98-0882-4a8d-b723-c101f97decf8
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: a7170621-9552-48ba-bd0b-8569624fb123
+        m_Path: <Keyboard>/g
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Mode Switch Input Action Property
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  ColorPickerUI: {fileID: 890334142}
 --- !u!1 &704331339
 GameObject:
   m_ObjectHideFlags: 0
@@ -4108,13 +4129,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23c9967929153f44b88098a5adbb4966, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ColorPickerUI
-  Panel: {fileID: 0}
-  PreviewImage: {fileID: 0}
-  RedSlider: {fileID: 0}
-  GreenSlider: {fileID: 0}
-  BlueSlider: {fileID: 0}
-  ApplyButton: {fileID: 0}
-  CancelButton: {fileID: 0}
+  Panel: {fileID: 535856625}
+  PreviewImage: {fileID: 355823539}
+  RedSlider: {fileID: 558477479}
+  GreenSlider: {fileID: 131807872}
+  BlueSlider: {fileID: 401479569}
+  ApplyButton: {fileID: 1038261413}
+  CancelButton: {fileID: 1528897073}
 --- !u!4 &890334143
 Transform:
   m_ObjectHideFlags: 0
@@ -5233,7 +5254,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5258,6 +5279,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1076900729}
   m_CullTransparentMesh: 1
+--- !u!1 &1121916663
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1121916664}
+  - component: {fileID: 1121916665}
+  m_Layer: 0
+  m_Name: BlockSelector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1121916664
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1121916663}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1121916665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1121916663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13a59f11dc72a1245bc71325cdd59fae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BlockSelector
 --- !u!1 &1142776408
 GameObject:
   m_ObjectHideFlags: 0
@@ -6352,7 +6417,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.2797284, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -6821,8 +6886,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingExecutor
   BlockPrefab: {fileID: 2732477202360886809, guid: e4e22c8ca2a80b742ae050500786796c, type: 3}
-  blockSpacing: 1
-  buildDelay: 0.1
 --- !u!4 &1868254808
 Transform:
   m_ObjectHideFlags: 0
@@ -6888,7 +6951,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 1, b: 0.009653807, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -6963,7 +7026,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -7177,7 +7240,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 1, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -7389,3 +7452,4 @@ SceneRoots:
   - {fileID: 1859780338}
   - {fileID: 1072375866}
   - {fileID: 1868254808}
+  - {fileID: 1121916664}

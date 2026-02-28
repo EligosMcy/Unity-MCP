@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.InputSystem;
 
 public class BuildingUI : MonoBehaviour
 {
@@ -44,6 +45,16 @@ public class BuildingUI : MonoBehaviour
     public TextMeshProUGUI ErrorText;
     public Button ErrorOkButton;
 
+    [Header("Input Controls")]
+    public InputActionProperty ModeSwitchInputActionProperty;
+
+    [Header("Color Picker")]
+    public ColorPickerUI ColorPickerUI;
+
+    // 模式枚举
+    private enum Mode { Build, Color }
+    private Mode _currentMode = Mode.Build;
+
     private BlueprintData _selectedBlueprint;
     private List<BlueprintData> _availableBlueprints;
 
@@ -63,6 +74,12 @@ public class BuildingUI : MonoBehaviour
         LoadBlueprints();
         UpdateMaterialDisplay();
         UpdateLevelDisplay();
+
+        // 初始状态：关闭 ColorPickerUI
+        if (ColorPickerUI != null)
+        {
+            ColorPickerUI.Hide();
+        }
     }
 
     private void InitializeUI()
@@ -86,6 +103,13 @@ public class BuildingUI : MonoBehaviour
         {
             MapYInput.text = "0";
             MapYInput.onEndEdit.AddListener(_ => ParseMapPosition());
+        }
+
+        // 模式切换输入动作
+        if (ModeSwitchInputActionProperty.action != null)
+        {
+            ModeSwitchInputActionProperty.action.Enable();
+            ModeSwitchInputActionProperty.action.performed += ctx => ToggleMode();
         }
     }
 
@@ -111,16 +135,16 @@ public class BuildingUI : MonoBehaviour
 
         if (BuildingExecutor.Instance != null)
         {
-            BuildingExecutor.Instance.OnBuildingStarted  += OnBuildingStarted;
+            BuildingExecutor.Instance.OnBuildingStarted += OnBuildingStarted;
             BuildingExecutor.Instance.OnBuildingCompleted += OnBuildingCompleted;
-            BuildingExecutor.Instance.OnBuildingProgress  += OnBuildingProgress;
-            BuildingExecutor.Instance.OnBuildingError     += OnBuildingError;
-            BuildingExecutor.Instance.OnBuildingPaused    += OnBuildingPaused;
-            BuildingExecutor.Instance.OnBuildingResumed   += OnBuildingResumed;
+            BuildingExecutor.Instance.OnBuildingProgress += OnBuildingProgress;
+            BuildingExecutor.Instance.OnBuildingError += OnBuildingError;
+            BuildingExecutor.Instance.OnBuildingPaused += OnBuildingPaused;
+            BuildingExecutor.Instance.OnBuildingResumed += OnBuildingResumed;
         }
 
-        if (BlockCustomizer.Instance?.ColorPicker != null)
-            BlockCustomizer.Instance.ColorPicker.OnColorApplied += OnColorApplied;
+        if (ColorPickerUI != null)
+            ColorPickerUI.OnColorApplied += OnColorApplied;
     }
 
     private void LoadBlueprints()
@@ -263,7 +287,60 @@ public class BuildingUI : MonoBehaviour
     }
 
     private void OnBuildingError(string error) => ShowError(error);
-    private void OnColorApplied(Color color) => Debug.Log($"Color applied: {color}");
+    private void OnColorApplied(Color color)
+    {
+        Debug.Log($"Color applied: {color}");
+
+        // 只有在颜色模式下才应用颜色
+        if (_currentMode != Mode.Color) return;
+
+        // 使用 BlockSelector 中悬停的方块
+        if (BlockSelector.Instance != null)
+        {
+            BlockController hoveredBlock = BlockSelector.Instance.GetHoveredBlock();
+            if (hoveredBlock != null)
+            {
+                hoveredBlock.SetColor(color);
+            }
+            else
+            {
+                ShowError("No block selected. Hover over a block to change its color.");
+            }
+        }
+    }
+
+    // 切换模式
+    private void ToggleMode()
+    {
+        _currentMode = (_currentMode == Mode.Build) ? Mode.Color : Mode.Build;
+        Debug.Log($"Mode switched to: {_currentMode}");
+        UpdateModeDisplay();
+    }
+
+    // 更新模式显示
+    private void UpdateModeDisplay()
+    {
+        Debug.Log($"Current mode: {_currentMode}");
+
+        switch (_currentMode)
+        {
+            case Mode.Color:
+                // 调色模式：开启 ColorPickerUI，关闭其他UI
+                if (ColorPickerUI != null) ColorPickerUI.Show();
+                if (BlueprintPanel != null) BlueprintPanel.SetActive(false);
+                if (MaterialPanel != null) MaterialPanel.SetActive(false);
+                if (BuildControlPanel != null) BuildControlPanel.SetActive(false);
+                break;
+
+            case Mode.Build:
+                // 建筑模式：关闭 ColorPickerUI，开启其他UI
+                if (ColorPickerUI != null) ColorPickerUI.Hide();
+                if (BlueprintPanel != null) BlueprintPanel.SetActive(true);
+                if (MaterialPanel != null) MaterialPanel.SetActive(true);
+                if (BuildControlPanel != null) BuildControlPanel.SetActive(true);
+                break;
+        }
+    }
 
     // ---- 按钮事件 ----
 
@@ -304,5 +381,15 @@ public class BuildingUI : MonoBehaviour
     private void HideError()
     {
         if (ErrorPanel != null) ErrorPanel.SetActive(false);
+    }
+
+    private void OnDestroy()
+    {
+        // 清理输入动作
+        if (ModeSwitchInputActionProperty.action != null)
+        {
+            ModeSwitchInputActionProperty.action.Disable();
+            ModeSwitchInputActionProperty.action.Dispose();
+        }
     }
 }

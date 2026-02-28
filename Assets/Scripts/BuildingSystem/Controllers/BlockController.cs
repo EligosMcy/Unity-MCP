@@ -4,6 +4,8 @@ public class BlockController : MonoBehaviour
 {
     private BlockData _blockData;
     private Renderer _renderer;
+    private bool _isHovered = false;
+    private Color _originalColor;
 
     public BlockData BlockData => _blockData;
 
@@ -15,6 +17,7 @@ public class BlockController : MonoBehaviour
         if (_renderer != null)
         {
             _renderer.material.color = blockData.Color;
+            _originalColor = blockData.Color;
         }
     }
 
@@ -24,37 +27,30 @@ public class BlockController : MonoBehaviour
         {
             _renderer.material.color = newColor;
             _blockData.Color = newColor;
+            _originalColor = newColor;
         }
     }
 
     public Color GetColor()
     {
-        if (_renderer != null)
-        {
-            return _renderer.material.color;
-        }
-        return Color.white;
+        return _originalColor;
     }
 
-    public void OnMouseEnter()
+    public void OnHoverEnter()
     {
-        if (_renderer != null)
+        if (_renderer != null && !_isHovered)
         {
-            Color originalColor = _renderer.material.color;
-            _renderer.material.color = Color.Lerp(originalColor, Color.white, 0.3f);
+            _isHovered = true;
+            _renderer.material.color = Color.Lerp(_originalColor, Color.white, 0.3f);
         }
     }
 
-    public void OnMouseExit()
+    public void OnHoverExit()
     {
-        if (_renderer != null)
+        if (_renderer != null && _isHovered)
         {
-            _renderer.material.color = _blockData.Color;
+            _isHovered = false;
+            _renderer.material.color = _originalColor;
         }
-    }
-
-    public void OnMouseDown()
-    {
-        BlockCustomizer.Instance?.SelectBlock(this);
     }
 }
