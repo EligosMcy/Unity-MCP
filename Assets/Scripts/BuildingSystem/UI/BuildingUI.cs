@@ -7,8 +7,6 @@ using UnityEngine.InputSystem;
 
 public class BuildingUI : MonoBehaviour
 {
-    public static BuildingUI Instance { get; private set; }
-
     [Header("Blueprint Selection")]
     public GameObject BlueprintPanel;
     public Transform BlueprintListContainer;
@@ -51,100 +49,93 @@ public class BuildingUI : MonoBehaviour
     [Header("Color Picker")]
     public ColorPickerUI ColorPickerUI;
 
-    // 模式枚举
-    private enum Mode { Build, Color }
-    private Mode _currentMode = Mode.Build;
-
-    private BlueprintData _selectedBlueprint;
+    private BuildingSystemPresenter _presenter;
+    private BuildingStateManager _stateManager;
+    private BuildingSystemManager _systemManager;
     private List<BlueprintData> _availableBlueprints;
-
-    // 当前选定的地图坐标，默认 (0,0)
-    private Vector2Int _currentMapPosition = Vector2Int.zero;
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        InitializeUI();
     }
 
     private void Start()
     {
-        InitializeUI();
-        SubscribeToEvents();
         LoadBlueprints();
-        UpdateMaterialDisplay();
-        UpdateLevelDisplay();
+        SetupInput();
+    }
 
-        // 初始状态：关闭 ColorPickerUI
-        if (ColorPickerUI != null)
-        {
-            ColorPickerUI.Hide();
-        }
+    public void Initialize(BuildingSystemManager systemManager)
+    {
+        _systemManager = systemManager;
+        _presenter = new BuildingSystemPresenter(systemManager, this);
+        _presenter.Initialize();
+    }
+
+    public void SetPresenter(BuildingSystemPresenter presenter)
+    {
+        _presenter = presenter;
+    }
+
+    public void SetStateManager(BuildingStateManager stateManager)
+    {
+        _stateManager = stateManager;
     }
 
     private void InitializeUI()
     {
-        BuildButton?.onClick.AddListener(OnBuildButtonClicked);
-        ClearButton?.onClick.AddListener(OnClearButtonClicked);
-        IncreaseWoodworkingButton?.onClick.AddListener(OnIncreaseWoodworkingClicked);
-        IncreaseConstructionButton?.onClick.AddListener(OnIncreaseConstructionClicked);
-        ErrorOkButton?.onClick.AddListener(HideError);
-        AddAllMaterialsButton?.onClick.AddListener(OnAddAllMaterialsClicked);
+        if (BuildButton != null)
+            BuildButton.onClick.AddListener(OnBuildButtonClicked);
 
-        if (ErrorPanel != null) ErrorPanel.SetActive(false);
+        if (ClearButton != null)
+            ClearButton.onClick.AddListener(OnClearButtonClicked);
 
-        // 坐标输入框初始化
+        if (AddAllMaterialsButton != null)
+            AddAllMaterialsButton.onClick.AddListener(OnAddAllMaterialsClicked);
+
+        if (IncreaseWoodworkingButton != null)
+            IncreaseWoodworkingButton.onClick.AddListener(OnIncreaseWoodworkingClicked);
+
+        if (IncreaseConstructionButton != null)
+            IncreaseConstructionButton.onClick.AddListener(OnIncreaseConstructionClicked);
+
+        if (ErrorOkButton != null)
+            ErrorOkButton.onClick.AddListener(OnErrorOkClicked);
+
         if (MapXInput != null)
-        {
-            MapXInput.text = "0";
-            MapXInput.onEndEdit.AddListener(_ => ParseMapPosition());
-        }
+            MapXInput.onEndEdit.AddListener(OnMapXChanged);
+
         if (MapYInput != null)
-        {
-            MapYInput.text = "0";
-            MapYInput.onEndEdit.AddListener(_ => ParseMapPosition());
-        }
-
-        // 模式切换输入动作
-        if (ModeSwitchInputActionProperty.action != null)
-        {
-            ModeSwitchInputActionProperty.action.Enable();
-            ModeSwitchInputActionProperty.action.performed += ctx => ToggleMode();
-        }
-    }
-
-    private void ParseMapPosition()
-    {
-        int x = 0, y = 0;
-        if (MapXInput != null) int.TryParse(MapXInput.text, out x);
-        if (MapYInput != null) int.TryParse(MapYInput.text, out y);
-        _currentMapPosition = new Vector2Int(x, y);
-        UpdateProgressDisplay();
-    }
-
-    private void SubscribeToEvents()
-    {
-        if (MaterialInventory.Instance != null)
-            MaterialInventory.Instance.OnMaterialChanged += OnMaterialChanged;
-
-        if (BuildingLevelManager.Instance != null)
-        {
-            BuildingLevelManager.Instance.OnWoodworkingLevelChanged += OnWoodworkingLevelChanged;
-            BuildingLevelManager.Instance.OnConstructionLevelChanged += OnConstructionLevelChanged;
-        }
-
-        if (BuildingExecutor.Instance != null)
-        {
-            BuildingExecutor.Instance.OnBuildingStarted += OnBuildingStarted;
-            BuildingExecutor.Instance.OnBuildingCompleted += OnBuildingCompleted;
-            BuildingExecutor.Instance.OnBuildingProgress += OnBuildingProgress;
-            BuildingExecutor.Instance.OnBuildingError += OnBuildingError;
-            BuildingExecutor.Instance.OnBuildingPaused += OnBuildingPaused;
-            BuildingExecutor.Instance.OnBuildingResumed += OnBuildingResumed;
-        }
+            MapYInput.onEndEdit.AddListener(OnMapYChanged);
 
         if (ColorPickerUI != null)
             ColorPickerUI.OnColorApplied += OnColorApplied;
+
+        if (ErrorPanel != null)
+            ErrorPanel.SetActive(false);
+    }
+
+    private void SetupInput()
+    {
+        if (ModeSwitchInputActionProperty != null && ModeSwitchInputActionProperty.action != null)
+        {
+            ModeSwitchInputActionProperty.action.performed += OnModeSwitchPerformed;
+            ModeSwitchInputActionProperty.action.Enable();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (ModeSwitchInputActionProperty != null && ModeSwitchInputActionProperty.action != null)
+        {
+            ModeSwitchInputActionProperty.action.performed -= OnModeSwitchPerformed;
+            ModeSwitchInputActionProperty.action.Disable();
+        }
+
+        if (ColorPickerUI != null)
+            ColorPickerUI.OnColorApplied -= OnColorApplied;
+
+        _presenter?.Cleanup();
     }
 
     private void LoadBlueprints()
@@ -161,179 +152,161 @@ public class BuildingUI : MonoBehaviour
     {
         if (BlueprintItemPrefab == null || BlueprintListContainer == null) return;
         var item = Instantiate(BlueprintItemPrefab, BlueprintListContainer);
-        item.GetComponent<BlueprintItemUI>()?.Initialize(blueprint, OnBlueprintSelected);
+        item.GetComponent<BlueprintItemUI>()?.Initialize(blueprint, OnBlueprintItemClicked);
     }
 
-    private void OnBlueprintSelected(BlueprintData blueprint)
+    private void OnBlueprintItemClicked(BlueprintData blueprint)
     {
-        _selectedBlueprint = blueprint;
-        UpdateBlueprintInfo();
-        UpdateMaterialStatus();
-        UpdateLevelStatus();
-        UpdateProgressDisplay();
+        _presenter?.OnBlueprintSelected(blueprint);
     }
 
-    // ---- 显示更新 ----
-
-    private void UpdateBlueprintInfo()
+    private void OnBuildButtonClicked()
     {
-        if (BlueprintInfoText == null || _selectedBlueprint == null) return;
-        BlueprintInfoText.text =
-            $"Blueprint: {_selectedBlueprint.BlueprintName}\n" +
-            $"Size: {_selectedBlueprint.Width}x{_selectedBlueprint.Height}x{_selectedBlueprint.Depth}\n" +
-            $"Total Blocks: {_selectedBlueprint.GetTotalBlockCount()}\n" +
-            $"Description: {_selectedBlueprint.Description}";
+        _presenter?.OnBuildButtonClicked();
     }
 
-    private void UpdateMaterialStatus()
+    private void OnClearButtonClicked()
     {
-        if (MaterialStatusText == null || _selectedBlueprint == null) return;
+        _presenter?.OnClearButtonClicked();
+    }
 
-        string status = "Material Requirements:\n";
-        foreach (var req in _selectedBlueprint.MaterialRequirements)
+    private void OnAddAllMaterialsClicked()
+    {
+        _presenter?.OnAddAllMaterialsClicked();
+    }
+
+    private void OnIncreaseWoodworkingClicked()
+    {
+        _presenter?.OnIncreaseWoodworkingClicked();
+    }
+
+    private void OnIncreaseConstructionClicked()
+    {
+        _presenter?.OnIncreaseConstructionClicked();
+    }
+
+    private void OnModeSwitchPerformed(InputAction.CallbackContext context)
+    {
+        _presenter?.OnModeToggleClicked();
+    }
+
+    private void OnMapXChanged(string value)
+    {
+        if (int.TryParse(value, out int x))
         {
-            int cur = MaterialInventory.Instance.GetMaterialCount(req.Key);
-            status += $"{req.Key}: {cur}/{req.Value}";
-            if (cur < req.Value) status += " [Insufficient]";
-            status += "\n";
+            _presenter?.OnMapPositionChanged(x, _stateManager?.CurrentMapPosition.y ?? 0);
         }
-        MaterialStatusText.text = status;
     }
 
-    private void UpdateLevelStatus()
+    private void OnMapYChanged(string value)
     {
-        if (LevelStatusText == null || _selectedBlueprint == null) return;
-        LevelStatusText.text = BuildingLevelManager.Instance.GetLevelRequirementsText(_selectedBlueprint.RequiredLevel);
+        if (int.TryParse(value, out int y))
+        {
+            _presenter?.OnMapPositionChanged(_stateManager?.CurrentMapPosition.x ?? 0, y);
+        }
     }
 
-    private void UpdateMaterialDisplay()
+    private void OnColorApplied(Color color)
+    {
+        _presenter?.OnColorApplied(color);
+    }
+
+    private void OnErrorOkClicked()
+    {
+        if (ErrorPanel != null)
+            ErrorPanel.SetActive(false);
+    }
+
+    private void OnAddMaterialClicked(MaterialType materialType)
+    {
+        _presenter?.OnAddMaterialClicked(materialType);
+    }
+
+    public void UpdateMaterialDisplay()
     {
         if (MaterialListContainer == null || MaterialItemPrefab == null) return;
         foreach (Transform child in MaterialListContainer) Destroy(child.gameObject);
 
-        foreach (var mat in MaterialInventory.Instance.GetAllMaterials())
+        if (_systemManager?.MaterialInventory == null) return;
+
+        foreach (var mat in _systemManager.MaterialInventory.GetAllMaterials())
         {
             var item = Instantiate(MaterialItemPrefab, MaterialListContainer);
             item.GetComponent<MaterialItemUI>()?.Initialize(mat.Key, mat.Value, OnAddMaterialClicked);
         }
     }
 
-    private void UpdateLevelDisplay()
+    public void UpdateBlueprintInfo(BlueprintData blueprint)
     {
-        if (WoodworkingLevelText != null)
-            WoodworkingLevelText.text = $"Woodworking Level: {BuildingLevelManager.Instance.GetWoodworkingLevel()}";
-        if (ConstructionLevelText != null)
-            ConstructionLevelText.text = $"Construction Level: {BuildingLevelManager.Instance.GetConstructionLevel()}";
+        if (BlueprintInfoText == null || blueprint == null) return;
+        BlueprintInfoText.text =
+            $"Blueprint: {blueprint.BlueprintName}\n" +
+            $"Size: {blueprint.Width}x{blueprint.Height}x{blueprint.Depth}\n" +
+            $"Total Blocks: {blueprint.GetTotalBlockCount()}\n" +
+            $"Description: {blueprint.Description}";
     }
 
-    /// 显示当前坐标建造进度（包括未完成的暂停任务）
-    private void UpdateProgressDisplay()
+    public void UpdateMaterialStatus()
     {
-        if (BuildingExecutor.Instance == null) return;
-        float progress = BuildingExecutor.Instance.GetSessionProgress(_currentMapPosition);
+        if (MaterialStatusText == null || _stateManager?.SelectedBlueprint == null) return;
+        var requirements = _stateManager.SelectedBlueprint.MaterialRequirements;
+        string text = "Material Status:\n";
+        foreach (var req in requirements)
+        {
+            int current = _systemManager?.MaterialInventory?.GetMaterialCount(req.Key) ?? 0;
+            text += $"{req.Key}: {current}/{req.Value}";
+            if (current < req.Value) text += " [Insufficient]";
+            text += "\n";
+        }
+        MaterialStatusText.text = text.Trim();
+    }
+
+    public void UpdateLevelDisplay()
+    {
+        if (WoodworkingLevelText == null || ConstructionLevelText == null) return;
+        WoodworkingLevelText.text = $"Woodworking: {_systemManager?.BuildingLevelManager?.GetWoodworkingLevel() ?? 1}";
+        ConstructionLevelText.text = $"Construction: {_systemManager?.BuildingLevelManager?.GetConstructionLevel() ?? 1}";
+    }
+
+    public void UpdateLevelStatus()
+    {
+        if (LevelStatusText == null || _stateManager?.SelectedBlueprint == null) return;
+        LevelStatusText.text = _systemManager?.BuildingLevelManager?.GetLevelRequirementsText(_stateManager.SelectedBlueprint.RequiredLevel) ?? "";
+    }
+
+    public void UpdateProgressDisplay()
+    {
+        if (_systemManager?.BuildingExecutor == null) return;
+        float progress = _systemManager.BuildingExecutor.GetSessionProgress(_stateManager?.CurrentMapPosition ?? Vector2Int.zero);
         SetProgressUI(progress);
     }
 
-    private void SetProgressUI(float progress)
+    public void SetProgressUI(float progress)
     {
-        if (BuildProgressSlider != null) BuildProgressSlider.value = progress;
+        if (BuildProgressSlider != null)
+            BuildProgressSlider.value = progress;
         if (BuildProgressText != null)
+            BuildProgressText.text = $"{(progress * 100):F0}%";
+    }
+
+    public void SetBuildButtonInteractable(bool interactable)
+    {
+        if (BuildButton != null)
+            BuildButton.interactable = interactable;
+    }
+
+    public void UpdateModeDisplay(BuildingMode mode)
+    {
+        switch (mode)
         {
-            if (progress <= 0f)
-                BuildProgressText.text = "Not Started";
-            else if (progress >= 1f)
-                BuildProgressText.text = "Building Complete!";
-            else
-                BuildProgressText.text = $"Building Progress: {progress * 100:F1}%";
-        }
-    }
-
-    // ---- 事件回调 ----
-
-    private void OnMaterialChanged(MaterialType t, int count) { UpdateMaterialDisplay(); UpdateMaterialStatus(); }
-    private void OnWoodworkingLevelChanged(int l) { UpdateLevelDisplay(); UpdateLevelStatus(); }
-    private void OnConstructionLevelChanged(int l) { UpdateLevelDisplay(); UpdateLevelStatus(); }
-
-    private void OnBuildingStarted(BlueprintData bp, Vector2Int pos)
-    {
-        if (pos == _currentMapPosition && BuildButton != null)
-            BuildButton.interactable = false;
-    }
-
-    private void OnBuildingCompleted(BlueprintData bp, Vector2Int pos)
-    {
-        if (pos != _currentMapPosition) return;
-        if (BuildButton != null) BuildButton.interactable = true;
-        SetProgressUI(1f);
-    }
-
-    private void OnBuildingProgress(float progress, Vector2Int pos)
-    {
-        if (pos == _currentMapPosition) SetProgressUI(progress);
-    }
-
-    private void OnBuildingPaused(BlueprintData bp, Vector2Int pos)
-    {
-        // 暂停时恢复按钮可点击，展示当前进度
-        if (pos != _currentMapPosition) return;
-        if (BuildButton != null) BuildButton.interactable = true;
-        UpdateProgressDisplay();
-    }
-
-    private void OnBuildingResumed(BlueprintData bp, Vector2Int pos)
-    {
-        if (pos == _currentMapPosition && BuildButton != null)
-            BuildButton.interactable = false;
-    }
-
-    private void OnBuildingError(string error) => ShowError(error);
-    private void OnColorApplied(Color color)
-    {
-        Debug.Log($"Color applied: {color}");
-
-        // 只有在颜色模式下才应用颜色
-        if (_currentMode != Mode.Color) return;
-
-        // 使用 BlockSelector 中悬停的方块
-        if (BlockSelector.Instance != null)
-        {
-            BlockController hoveredBlock = BlockSelector.Instance.GetHoveredBlock();
-            if (hoveredBlock != null)
-            {
-                hoveredBlock.SetColor(color);
-            }
-            else
-            {
-                ShowError("No block selected. Hover over a block to change its color.");
-            }
-        }
-    }
-
-    // 切换模式
-    private void ToggleMode()
-    {
-        _currentMode = (_currentMode == Mode.Build) ? Mode.Color : Mode.Build;
-        Debug.Log($"Mode switched to: {_currentMode}");
-        UpdateModeDisplay();
-    }
-
-    // 更新模式显示
-    private void UpdateModeDisplay()
-    {
-        Debug.Log($"Current mode: {_currentMode}");
-
-        switch (_currentMode)
-        {
-            case Mode.Color:
-                // 调色模式：开启 ColorPickerUI，关闭其他UI
+            case BuildingMode.Color:
                 if (ColorPickerUI != null) ColorPickerUI.Show();
                 if (BlueprintPanel != null) BlueprintPanel.SetActive(false);
                 if (MaterialPanel != null) MaterialPanel.SetActive(false);
                 if (BuildControlPanel != null) BuildControlPanel.SetActive(false);
                 break;
 
-            case Mode.Build:
-                // 建筑模式：关闭 ColorPickerUI，开启其他UI
+            case BuildingMode.Build:
                 if (ColorPickerUI != null) ColorPickerUI.Hide();
                 if (BlueprintPanel != null) BlueprintPanel.SetActive(true);
                 if (MaterialPanel != null) MaterialPanel.SetActive(true);
@@ -342,54 +315,9 @@ public class BuildingUI : MonoBehaviour
         }
     }
 
-    // ---- 按钮事件 ----
-
-    private void OnBuildButtonClicked()
-    {
-        if (_selectedBlueprint == null) { ShowError("Please select a blueprint first"); return; }
-        if (BuildingExecutor.Instance == null) { ShowError("Building system not initialized"); return; }
-        if (!BuildingExecutor.Instance.CheckCanBuild(_selectedBlueprint)) return;
-
-        // 直接启动——材料消耗在协程里逐块进行
-        BuildingExecutor.Instance.StartBuilding(_selectedBlueprint, _currentMapPosition);
-    }
-
-    private void OnClearButtonClicked()
-    {
-        BuildingExecutor.Instance?.ClearBuilding(_currentMapPosition);
-        SetProgressUI(0f);
-    }
-
-    private void OnAddMaterialClicked(MaterialType t) => MaterialInventory.Instance.AddMaterial(t, 10);
-    private void OnAddAllMaterialsClicked()
-    {
-        // 给所有材料类型添加200个
-        foreach (MaterialType materialType in Enum.GetValues(typeof(MaterialType)))
-        {
-            MaterialInventory.Instance.AddMaterial(materialType, 200);
-        }
-    }
-    private void OnIncreaseWoodworkingClicked() => BuildingLevelManager.Instance.AddWoodworkingLevel(1);
-    private void OnIncreaseConstructionClicked() => BuildingLevelManager.Instance.AddConstructionLevel(1);
-
-    private void ShowError(string msg)
+    public void ShowError(string msg)
     {
         if (ErrorText != null) ErrorText.text = msg;
         if (ErrorPanel != null) ErrorPanel.SetActive(true);
-    }
-
-    private void HideError()
-    {
-        if (ErrorPanel != null) ErrorPanel.SetActive(false);
-    }
-
-    private void OnDestroy()
-    {
-        // 清理输入动作
-        if (ModeSwitchInputActionProperty.action != null)
-        {
-            ModeSwitchInputActionProperty.action.Disable();
-            ModeSwitchInputActionProperty.action.Dispose();
-        }
     }
 }

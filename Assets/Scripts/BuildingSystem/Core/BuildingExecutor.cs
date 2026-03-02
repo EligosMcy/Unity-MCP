@@ -3,14 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuildingExecutor : MonoBehaviour
+public class BuildingExecutor : MonoBehaviour, IBuildingExecutor
 {
-    public static BuildingExecutor Instance { get; private set; }
-
     [Header("方块预制体")]
     public GameObject BlockPrefab;
 
-    // key: 地图坐标 (x,y)
+    private IMaterialInventory _materialInventory;
+    private IBuildingLevelManager _levelManager;
+
     private Dictionary<Vector2Int, BuildingSession> _sessions;
     private Vector2Int? _activeSessionKey;
     private bool _isBuilding = false;
@@ -32,51 +32,42 @@ public class BuildingExecutor : MonoBehaviour
         public bool isCompleted = false;
     }
 
-    private void Awake()
+    public void Initialize(IMaterialInventory materialInventory, IBuildingLevelManager levelManager)
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            _sessions = new Dictionary<Vector2Int, BuildingSession>();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        _materialInventory = materialInventory;
+        _levelManager = levelManager;
+        _sessions = new Dictionary<Vector2Int, BuildingSession>();
     }
 
     public bool CheckCanBuild(BlueprintData blueprint)
     {
         if (blueprint == null)
         {
-            OnBuildingError?.Invoke("Blueprint data is null");
+            OnBuildingError?.Invoke("Blueprint is null");
             return false;
         }
-        if (!BuildingLevelManager.Instance.CanBuildWithLevel(blueprint.RequiredLevel))
+
+        if (_materialInventory == null)
         {
-            OnBuildingError?.Invoke("Insufficient level to build");
+            OnBuildingError?.Invoke("Material inventory not initialized");
             return false;
         }
+
+        if (_levelManager == null)
+        {
+            OnBuildingError?.Invoke("Level manager not initialized");
+            return false;
+        }
+
+        if (!_levelManager.CanBuildWithLevel(blueprint.RequiredLevel))
+        {
+            OnBuildingError?.Invoke(_levelManager.GetLevelRequirementsText(blueprint.RequiredLevel));
+            return false;
+        }
+
         return true;
     }
 
-    public bool HasPendingSession(Vector2Int mapPosition)
-    {
-        return _sessions.TryGetValue(mapPosition, out var s) && !s.isCompleted;
-    }
-
-    public float GetSessionProgress(Vector2Int mapPosition)
-    {
-        if (!_sessions.TryGetValue(mapPosition, out var s)) return 0f;
-        if (s.blueprint.Blocks.Count == 0) return 0f;
-        return (float)s.nextBlockIndex / s.blueprint.Blocks.Count;
-    }
-
-    /// <summary>
-    /// 开始建造。同一坐标已有未完成任务则继续，否则新建。
-    /// mapPosition 为二维地图坐标，世界 Y 固定为 0。
-    /// </summary>
     public void StartBuilding(BlueprintData blueprint, Vector2Int mapPosition)
     {
         if (_isBuilding)
@@ -101,7 +92,6 @@ public class BuildingExecutor : MonoBehaviour
                 nextBlockIndex = 0,
                 isCompleted    = false
             };
-            // 计算建筑物中心点偏移量，使建筑物中心点与目标位置对齐
             float centerOffsetX = (blueprint.Width - 1) * blueprint.BlockSpacing / 2f;
             float centerOffsetZ = (blueprint.Depth - 1) * blueprint.BlockSpacing / 2f;
             Vector3 worldPos = new Vector3(mapPosition.x - centerOffsetX, 0f, mapPosition.y - centerOffsetZ);
@@ -124,8 +114,7 @@ public class BuildingExecutor : MonoBehaviour
         {
             BlockData blockData = session.blueprint.Blocks[session.nextBlockIndex];
 
-            // 每个方块单独消耗 1 个对应材料
-            if (!MaterialInventory.Instance.ConsumeMaterial(blockData.MaterialType, 1))
+            if (!_materialInventory.ConsumeMaterial(blockData.MaterialType, 1))
             {
                 _isBuilding = false;
                 _activeSessionKey = null;
@@ -134,8 +123,6 @@ public class BuildingExecutor : MonoBehaviour
                 yield break;
             }
 
-            // 计算方块的 Y 坐标，使最底层方块的底部与地面平齐
-            // 假设方块的原点在中心，高度为 1 单位
             float yPos = blockData.Y * session.blueprint.BlockSpacing + 0.5f;
             Vector3 localPos = new Vector3(
                 blockData.X * session.blueprint.BlockSpacing,
@@ -164,7 +151,6 @@ public class BuildingExecutor : MonoBehaviour
         GameObject block = Instantiate(BlockPrefab, parent);
         block.transform.localPosition = localPosition;
         
-        // 确保方块有Collider组件，以便触发鼠标事件
         if (block.GetComponent<Collider>() == null)
         {
             block.AddComponent<BoxCollider>();
@@ -179,14 +165,11 @@ public class BuildingExecutor : MonoBehaviour
     {
         if (_sessions.TryGetValue(mapPosition, out var session))
         {
-            if (session.buildingParent != null) Destroy(session.buildingParent);
+            if (session.buildingParent != null)
+            {
+                Destroy(session.buildingParent);
+            }
             _sessions.Remove(mapPosition);
-        }
-        if (_activeSessionKey == mapPosition)
-        {
-            StopAllCoroutines();
-            _isBuilding = false;
-            _activeSessionKey = null;
         }
     }
 
@@ -198,6 +181,14 @@ public class BuildingExecutor : MonoBehaviour
         _sessions.Clear();
         _isBuilding = false;
         _activeSessionKey = null;
+    }
+
+    public float GetSessionProgress(Vector2Int mapPosition)
+    {
+        if (!_sessions.TryGetValue(mapPosition, out var session)) return 0f;
+        if (session.isCompleted) return 1f;
+        if (session.blueprint.Blocks.Count == 0) return 0f;
+        return (float)session.nextBlockIndex / session.blueprint.Blocks.Count;
     }
 
     public bool IsBuilding() => _isBuilding;

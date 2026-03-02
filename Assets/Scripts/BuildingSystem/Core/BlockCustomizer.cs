@@ -3,46 +3,33 @@ using UnityEngine;
 
 public class BlockCustomizer : MonoBehaviour
 {
-    public static BlockCustomizer Instance { get; private set; }
-
     [Header("颜色选择器")]
     public ColorPickerUI ColorPicker;
 
     private BlockController _selectedBlock;
+    private BlockSelector _blockSelector;
 
     public event Action<BlockController> OnBlockSelected;
     public event Action<BlockController, Color> OnBlockColorChanged;
 
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
     private void Start()
     {
-        if (BlockSelector.Instance != null)
+        _blockSelector = GetComponent<BlockSelector>();
+        if (_blockSelector != null)
         {
-            BlockSelector.Instance.OnBlockClick += HandleBlockClick;
+            _blockSelector.OnBlockClick += HandleBlockClick;
         }
         else
         {
-            Debug.LogWarning("BlockCustomizer: BlockSelector.Instance is null!");
+            Debug.LogWarning("BlockCustomizer: BlockSelector component not found!");
         }
     }
 
     private void OnDestroy()
     {
-        if (BlockSelector.Instance != null)
+        if (_blockSelector != null)
         {
-            BlockSelector.Instance.OnBlockClick -= HandleBlockClick;
+            _blockSelector.OnBlockClick -= HandleBlockClick;
         }
     }
 

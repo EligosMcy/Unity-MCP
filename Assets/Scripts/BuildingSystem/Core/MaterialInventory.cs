@@ -2,26 +2,15 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MaterialInventory : MonoBehaviour
+public class MaterialInventory : MonoBehaviour, IMaterialInventory
 {
-    public static MaterialInventory Instance { get; private set; }
-
     private Dictionary<MaterialType, int> _materials;
 
     public event Action<MaterialType, int> OnMaterialChanged;
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            InitializeMaterials();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        InitializeMaterials();
     }
 
     private void InitializeMaterials()

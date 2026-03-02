@@ -1,29 +1,19 @@
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class BlockSelector : MonoBehaviour
 {
-    public static BlockSelector Instance { get; private set; }
-
     public event Action<BlockController> OnBlockHoverEnter;
     public event Action<BlockController> OnBlockHoverExit;
     public event Action<BlockController> OnBlockClick;
 
+    [SerializeField]
+    private GameObject _gizmoCubePrefab;
+
     private BlockController _hoveredBlock;
     private Camera _mainCamera;
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
+    private BuildingInputProvider _inputProvider;
+    private GameObject _currentGizmoCubeInstance;
 
     private void Start()
     {
@@ -32,11 +22,25 @@ public class BlockSelector : MonoBehaviour
         {
             Debug.LogError("BlockSelector: Main camera not found!");
         }
+
+        _inputProvider = GetComponent<BuildingInputProvider>();
+        if (_inputProvider != null)
+        {
+            _inputProvider.OnMouseClicked += HandleMouseClick;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (_inputProvider != null)
+        {
+            _inputProvider.OnMouseClicked -= HandleMouseClick;
+        }
     }
 
     private void Update()
     {
-        if (_mainCamera == null)
+        if (_mainCamera == null || _inputProvider == null)
             return;
 
         HandleRaycast();
@@ -44,7 +48,7 @@ public class BlockSelector : MonoBehaviour
 
     private void HandleRaycast()
     {
-        Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
+        Vector2 mouseScreenPos = _inputProvider.GetMousePosition();
         Ray ray = _mainCamera.ScreenPointToRay(mouseScreenPos);
         RaycastHit hit;
 
@@ -65,11 +69,7 @@ public class BlockSelector : MonoBehaviour
                     _hoveredBlock = block;
                     _hoveredBlock.OnHoverEnter();
                     OnBlockHoverEnter?.Invoke(_hoveredBlock);
-                }
-
-                if (Mouse.current.leftButton.wasPressedThisFrame)
-                {
-                    OnBlockClick?.Invoke(_hoveredBlock);
+                    UpdateGizmoCube(_hoveredBlock);
                 }
             }
             else
@@ -83,6 +83,14 @@ public class BlockSelector : MonoBehaviour
         }
     }
 
+    private void HandleMouseClick()
+    {
+        if (_hoveredBlock != null)
+        {
+            OnBlockClick?.Invoke(_hoveredBlock);
+        }
+    }
+
     private void ClearHover()
     {
         if (_hoveredBlock != null)
@@ -90,6 +98,30 @@ public class BlockSelector : MonoBehaviour
             _hoveredBlock.OnHoverExit();
             OnBlockHoverExit?.Invoke(_hoveredBlock);
             _hoveredBlock = null;
+        }
+        ClearGizmoCube();
+    }
+
+    private void UpdateGizmoCube(BlockController targetBlock)
+    {
+        if (_gizmoCubePrefab == null || targetBlock == null)
+            return;
+
+        ClearGizmoCube();
+
+        _currentGizmoCubeInstance = Instantiate(_gizmoCubePrefab, targetBlock.transform.position, Quaternion.identity);
+        _currentGizmoCubeInstance.transform.SetParent(targetBlock.transform);
+        _currentGizmoCubeInstance.transform.localPosition = Vector3.zero;
+        _currentGizmoCubeInstance.transform.localRotation = Quaternion.identity;
+        _currentGizmoCubeInstance.transform.localScale = Vector3.one * 1.05f;
+    }
+
+    private void ClearGizmoCube()
+    {
+        if (_currentGizmoCubeInstance != null)
+        {
+            Destroy(_currentGizmoCubeInstance);
+            _currentGizmoCubeInstance = null;
         }
     }
 

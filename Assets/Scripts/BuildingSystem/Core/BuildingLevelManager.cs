@@ -1,29 +1,13 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class BuildingLevelManager : MonoBehaviour
+public class BuildingLevelManager : MonoBehaviour, IBuildingLevelManager
 {
-    public static BuildingLevelManager Instance { get; private set; }
-
     private int _woodworkingLevel = 1;
     private int _constructionLevel = 1;
 
     public event Action<int> OnWoodworkingLevelChanged;
     public event Action<int> OnConstructionLevelChanged;
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
 
     public int GetWoodworkingLevel()
     {
