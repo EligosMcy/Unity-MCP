@@ -45,7 +45,9 @@ public class BlockCustomizer : MonoBehaviour
 
         if (ColorPicker != null)
         {
-            ColorPicker.SetInitialColor(block.GetColor());
+            Color selectColor = block.GetColor();
+            Debug.Log($"Select Block: {selectColor}");
+            ColorPicker.SetInitialColor(selectColor);
         }
     }
 

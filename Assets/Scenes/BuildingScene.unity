@@ -1129,6 +1129,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlockSelector
   _gizmoCubePrefab: {fileID: 8822196248603310723, guid: e213f16066e0c5c44bf9e2cee505182e, type: 3}
+  _hoverColor: {r: 1, g: 1, b: 1, a: 1}
+  _selectColor: {r: 0.5764706, g: 0.4392157, b: 0.8588236, a: 1}
+  _hoverScale: 1.05
+  _selectScale: 1.08
 --- !u!114 &197385844
 MonoBehaviour:
   m_ObjectHideFlags: 0

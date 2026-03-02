@@ -7,12 +7,14 @@ public class BuildingSystemPresenter
     private BuildingSystemManager _systemManager;
     private BuildingStateManager _stateManager;
     private BuildingUI _ui;
+    private BlockSelector _blockSelector;
 
     public BuildingSystemPresenter(BuildingSystemManager systemManager, BuildingUI ui)
     {
         _systemManager = systemManager;
         _stateManager = new BuildingStateManager();
         _ui = ui;
+        _blockSelector = systemManager.GetComponent<BlockSelector>();
     }
 
     public void Initialize()
@@ -226,6 +228,15 @@ public class BuildingSystemPresenter
     private void HandleModeChanged(BuildingMode mode)
     {
         _ui.UpdateModeDisplay(mode);
+
+        if (_blockSelector != null)
+        {
+            _blockSelector.IsColorMode = mode == BuildingMode.Color;
+            if (mode == BuildingMode.Build)
+            {
+                _blockSelector.ClearSelection();
+            }
+        }
     }
 
     private void HandleBlueprintSelectedFromState(BlueprintData blueprint)

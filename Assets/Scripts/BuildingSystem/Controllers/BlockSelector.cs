@@ -7,13 +7,31 @@ public class BlockSelector : MonoBehaviour
     public event Action<BlockController> OnBlockHoverExit;
     public event Action<BlockController> OnBlockClick;
 
+    [Header("GizmoCube预制体")]
     [SerializeField]
     private GameObject _gizmoCubePrefab;
 
+    [Header("颜色设置")]
+    [SerializeField]
+    private Color _hoverColor = Color.yellow;
+    [SerializeField]
+    private Color _selectColor = Color.green;
+
+    [Header("大小设置")]
+    [SerializeField]
+    private float _hoverScale = 1.05f;
+    [SerializeField]
+    private float _selectScale = 1.08f;
+
     private BlockController _hoveredBlock;
+    private BlockController _selectedBlock;
     private Camera _mainCamera;
     private BuildingInputProvider _inputProvider;
-    private GameObject _currentGizmoCubeInstance;
+
+    private GameObject _hoverGizmoCubeInstance;
+    private GameObject _selectGizmoCubeInstance;
+
+    public bool IsColorMode { get; set; }
 
     private void Start()
     {
@@ -28,6 +46,37 @@ public class BlockSelector : MonoBehaviour
         {
             _inputProvider.OnMouseClicked += HandleMouseClick;
         }
+
+        InitializeGizmoCubes();
+    }
+
+    private void InitializeGizmoCubes()
+    {
+        if (_gizmoCubePrefab != null)
+        {
+            _hoverGizmoCubeInstance = Instantiate(_gizmoCubePrefab, Vector3.zero, Quaternion.identity);
+            _hoverGizmoCubeInstance.name = "HoverGizmoCube";
+            _hoverGizmoCubeInstance.SetActive(false);
+
+            _selectGizmoCubeInstance = Instantiate(_gizmoCubePrefab, Vector3.zero, Quaternion.identity);
+            _selectGizmoCubeInstance.name = "SelectGizmoCube";
+            _selectGizmoCubeInstance.SetActive(false);
+
+            SetGizmoCubeColor(_hoverGizmoCubeInstance, _hoverColor);
+            SetGizmoCubeColor(_selectGizmoCubeInstance, _selectColor);
+        }
+    }
+
+    private void SetGizmoCubeColor(GameObject gizmoCube, Color color)
+    {
+        if (gizmoCube == null)
+            return;
+
+        Renderer[] renderers = gizmoCube.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
+        {
+            renderer.material.color = color;
+        }
     }
 
     private void OnDestroy()
@@ -35,6 +84,16 @@ public class BlockSelector : MonoBehaviour
         if (_inputProvider != null)
         {
             _inputProvider.OnMouseClicked -= HandleMouseClick;
+        }
+
+        if (_hoverGizmoCubeInstance != null)
+        {
+            Destroy(_hoverGizmoCubeInstance);
+        }
+
+        if (_selectGizmoCubeInstance != null)
+        {
+            Destroy(_selectGizmoCubeInstance);
         }
     }
 
@@ -48,6 +107,9 @@ public class BlockSelector : MonoBehaviour
 
     private void HandleRaycast()
     {
+        if (!IsColorMode)
+            return;
+
         Vector2 mouseScreenPos = _inputProvider.GetMousePosition();
         Ray ray = _mainCamera.ScreenPointToRay(mouseScreenPos);
         RaycastHit hit;
@@ -60,16 +122,21 @@ public class BlockSelector : MonoBehaviour
             {
                 if (_hoveredBlock != block)
                 {
-                    if (_hoveredBlock != null)
+                    if (_hoveredBlock != null && _hoveredBlock != _selectedBlock)
                     {
                         _hoveredBlock.OnHoverExit();
                         OnBlockHoverExit?.Invoke(_hoveredBlock);
                     }
 
                     _hoveredBlock = block;
-                    _hoveredBlock.OnHoverEnter();
-                    OnBlockHoverEnter?.Invoke(_hoveredBlock);
-                    UpdateGizmoCube(_hoveredBlock);
+
+                    if (_hoveredBlock != _selectedBlock)
+                    {
+                        _hoveredBlock.OnHoverEnter();
+                        OnBlockHoverEnter?.Invoke(_hoveredBlock);
+                    }
+
+                    UpdateHoverGizmoCube(_hoveredBlock);
                 }
             }
             else
@@ -81,47 +148,98 @@ public class BlockSelector : MonoBehaviour
         {
             ClearHover();
         }
+
+        UpdateGizmoCubeVisibility();
+    }
+
+    private void UpdateGizmoCubeVisibility()
+    {
+        if (_selectedBlock != null && _hoveredBlock == _selectedBlock)
+        {
+            HideHoverGizmoCube();
+        }
     }
 
     private void HandleMouseClick()
     {
+        if (!IsColorMode)
+            return;
+
         if (_hoveredBlock != null)
         {
-            OnBlockClick?.Invoke(_hoveredBlock);
+            if (_selectedBlock != null && _selectedBlock != _hoveredBlock)
+            {
+                _selectedBlock.OnHoverExit();
+                OnBlockHoverExit?.Invoke(_selectedBlock);
+            }
+
+            _selectedBlock = _hoveredBlock;
+            _selectedBlock.OnHoverEnter();
+            OnBlockHoverEnter?.Invoke(_selectedBlock);
+
+            UpdateSelectGizmoCube(_selectedBlock);
+            OnBlockClick?.Invoke(_selectedBlock);
         }
     }
 
     private void ClearHover()
     {
-        if (_hoveredBlock != null)
+        if (_hoveredBlock != null && _hoveredBlock != _selectedBlock)
         {
             _hoveredBlock.OnHoverExit();
             OnBlockHoverExit?.Invoke(_hoveredBlock);
             _hoveredBlock = null;
         }
-        ClearGizmoCube();
+
+        HideHoverGizmoCube();
     }
 
-    private void UpdateGizmoCube(BlockController targetBlock)
+    private void UpdateHoverGizmoCube(BlockController targetBlock)
     {
-        if (_gizmoCubePrefab == null || targetBlock == null)
+        if (_hoverGizmoCubeInstance == null || targetBlock == null)
             return;
 
-        ClearGizmoCube();
+        if (_selectedBlock != null && targetBlock == _selectedBlock)
+        {
+            HideHoverGizmoCube();
+            return;
+        }
 
-        _currentGizmoCubeInstance = Instantiate(_gizmoCubePrefab, targetBlock.transform.position, Quaternion.identity);
-        _currentGizmoCubeInstance.transform.SetParent(targetBlock.transform);
-        _currentGizmoCubeInstance.transform.localPosition = Vector3.zero;
-        _currentGizmoCubeInstance.transform.localRotation = Quaternion.identity;
-        _currentGizmoCubeInstance.transform.localScale = Vector3.one * 1.05f;
+        ShowGizmoCube(_hoverGizmoCubeInstance, targetBlock, _hoverScale);
     }
 
-    private void ClearGizmoCube()
+    private void UpdateSelectGizmoCube(BlockController targetBlock)
     {
-        if (_currentGizmoCubeInstance != null)
+        if (_selectGizmoCubeInstance == null || targetBlock == null)
+            return;
+
+        ShowGizmoCube(_selectGizmoCubeInstance, targetBlock, _selectScale);
+    }
+
+    private void ShowGizmoCube(GameObject gizmoCube, BlockController targetBlock, float scale)
+    {
+        gizmoCube.transform.SetParent(targetBlock.transform);
+        gizmoCube.transform.localPosition = Vector3.zero;
+        gizmoCube.transform.localRotation = Quaternion.identity;
+        gizmoCube.transform.localScale = Vector3.one * scale;
+        gizmoCube.SetActive(true);
+    }
+
+    private void HideHoverGizmoCube()
+    {
+        if (_hoverGizmoCubeInstance != null)
         {
-            Destroy(_currentGizmoCubeInstance);
-            _currentGizmoCubeInstance = null;
+            _hoverGizmoCubeInstance.SetActive(false);
+            _hoverGizmoCubeInstance.transform.SetParent(null);
+        }
+    }
+
+    private void HideSelectGizmoCube()
+    {
+        if (_selectGizmoCubeInstance != null)
+        {
+            _selectGizmoCubeInstance.SetActive(false);
+            _selectGizmoCubeInstance.transform.SetParent(null);
         }
     }
 
@@ -130,8 +248,22 @@ public class BlockSelector : MonoBehaviour
         return _hoveredBlock;
     }
 
+    public BlockController GetSelectedBlock()
+    {
+        return _selectedBlock;
+    }
+
     public void ClearSelection()
     {
-        ClearHover();
+        if (_hoveredBlock != null)
+        {
+            _hoveredBlock.OnHoverExit();
+            OnBlockHoverExit?.Invoke(_hoveredBlock);
+            _hoveredBlock = null;
+        }
+
+        _selectedBlock = null;
+        HideHoverGizmoCube();
+        HideSelectGizmoCube();
     }
 }

@@ -14,6 +14,7 @@ public class ColorPickerUI : MonoBehaviour
     public Button CancelButton;
 
     private Color _currentColor;
+    private bool _isUpdatingSliders;
 
     public event UnityAction<Color> OnColorApplied;
 
@@ -111,6 +112,8 @@ public class ColorPickerUI : MonoBehaviour
 
     private void updateSliders()
     {
+        _isUpdatingSliders = true;
+
         if (RedSlider != null)
         {
             RedSlider.value = _currentColor.r;
@@ -125,10 +128,17 @@ public class ColorPickerUI : MonoBehaviour
         {
             BlueSlider.value = _currentColor.b;
         }
+
+        _isUpdatingSliders = false;
     }
 
     private void updateColor(float value)
     {
+        if (_isUpdatingSliders)
+        {
+            return;
+        }
+
         if (RedSlider != null && GreenSlider != null && BlueSlider != null)
         {
             _currentColor = new Color(RedSlider.value, GreenSlider.value, BlueSlider.value);

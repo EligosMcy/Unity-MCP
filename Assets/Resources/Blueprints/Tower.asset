@@ -17,7 +17,7 @@ MonoBehaviour:
   Height: 8
   Depth: 3
   BlockSpacing: 1
-  BuildDelay: 0.2
+  BuildDelay: 0.1
   Blocks:
   - X: 0
     Y: 0
