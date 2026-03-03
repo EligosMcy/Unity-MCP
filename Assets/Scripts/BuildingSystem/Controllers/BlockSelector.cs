@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class BlockSelector : MonoBehaviour
@@ -23,10 +24,15 @@ public class BlockSelector : MonoBehaviour
     [SerializeField]
     private float _selectScale = 1.08f;
 
+    [Header("检测设置")]
+    [SerializeField]
+    private float _raycastInterval = 0.05f;
+
     private BlockController _hoveredBlock;
     private BlockController _selectedBlock;
     private Camera _mainCamera;
     private BuildingInputProvider _inputProvider;
+    private Coroutine _raycastCoroutine;
 
     private GameObject _hoverGizmoCubeInstance;
     private GameObject _selectGizmoCubeInstance;
@@ -44,13 +50,26 @@ public class BlockSelector : MonoBehaviour
         _inputProvider = GetComponent<BuildingInputProvider>();
         if (_inputProvider != null)
         {
-            _inputProvider.OnMouseClicked += HandleMouseClick;
+            _inputProvider.OnMouseClicked += handleMouseClick;
         }
 
-        InitializeGizmoCubes();
+        initializeGizmoCubes();
+        _raycastCoroutine = StartCoroutine(raycastLoop());
     }
 
-    private void InitializeGizmoCubes()
+    private IEnumerator raycastLoop()
+    {
+        while (true)
+        {
+            if (IsColorMode && _mainCamera != null && _inputProvider != null)
+            {
+                handleRaycast();
+            }
+            yield return new WaitForSeconds(_raycastInterval);
+        }
+    }
+
+    private void initializeGizmoCubes()
     {
         if (_gizmoCubePrefab != null)
         {
@@ -62,12 +81,12 @@ public class BlockSelector : MonoBehaviour
             _selectGizmoCubeInstance.name = "SelectGizmoCube";
             _selectGizmoCubeInstance.SetActive(false);
 
-            SetGizmoCubeColor(_hoverGizmoCubeInstance, _hoverColor);
-            SetGizmoCubeColor(_selectGizmoCubeInstance, _selectColor);
+            setGizmoCubeColor(_hoverGizmoCubeInstance, _hoverColor);
+            setGizmoCubeColor(_selectGizmoCubeInstance, _selectColor);
         }
     }
 
-    private void SetGizmoCubeColor(GameObject gizmoCube, Color color)
+    private void setGizmoCubeColor(GameObject gizmoCube, Color color)
     {
         if (gizmoCube == null)
             return;
@@ -81,9 +100,14 @@ public class BlockSelector : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (_raycastCoroutine != null)
+        {
+            StopCoroutine(_raycastCoroutine);
+        }
+
         if (_inputProvider != null)
         {
-            _inputProvider.OnMouseClicked -= HandleMouseClick;
+            _inputProvider.OnMouseClicked -= handleMouseClick;
         }
 
         if (_hoverGizmoCubeInstance != null)
@@ -99,13 +123,9 @@ public class BlockSelector : MonoBehaviour
 
     private void Update()
     {
-        if (_mainCamera == null || _inputProvider == null)
-            return;
-
-        HandleRaycast();
     }
 
-    private void HandleRaycast()
+    private void handleRaycast()
     {
         if (!IsColorMode)
             return;
@@ -136,31 +156,31 @@ public class BlockSelector : MonoBehaviour
                         OnBlockHoverEnter?.Invoke(_hoveredBlock);
                     }
 
-                    UpdateHoverGizmoCube(_hoveredBlock);
+                    updateHoverGizmoCube(_hoveredBlock);
                 }
             }
             else
             {
-                ClearHover();
+                clearHover();
             }
         }
         else
         {
-            ClearHover();
+            clearHover();
         }
 
-        UpdateGizmoCubeVisibility();
+        updateGizmoCubeVisibility();
     }
 
-    private void UpdateGizmoCubeVisibility()
+    private void updateGizmoCubeVisibility()
     {
         if (_selectedBlock != null && _hoveredBlock == _selectedBlock)
         {
-            HideHoverGizmoCube();
+            hideHoverGizmoCube();
         }
     }
 
-    private void HandleMouseClick()
+    private void handleMouseClick()
     {
         if (!IsColorMode)
             return;
@@ -177,46 +197,49 @@ public class BlockSelector : MonoBehaviour
             _selectedBlock.OnHoverEnter();
             OnBlockHoverEnter?.Invoke(_selectedBlock);
 
-            UpdateSelectGizmoCube(_selectedBlock);
+            updateSelectGizmoCube(_selectedBlock);
             OnBlockClick?.Invoke(_selectedBlock);
         }
     }
 
-    private void ClearHover()
+    private void clearHover()
     {
-        if (_hoveredBlock != null && _hoveredBlock != _selectedBlock)
+        if (_hoveredBlock != null)
         {
-            _hoveredBlock.OnHoverExit();
-            OnBlockHoverExit?.Invoke(_hoveredBlock);
+            if (_hoveredBlock != _selectedBlock)
+            {
+                _hoveredBlock.OnHoverExit();
+                OnBlockHoverExit?.Invoke(_hoveredBlock);
+            }
             _hoveredBlock = null;
         }
 
-        HideHoverGizmoCube();
+        hideHoverGizmoCube();
     }
 
-    private void UpdateHoverGizmoCube(BlockController targetBlock)
+    private void updateHoverGizmoCube(BlockController targetBlock)
     {
         if (_hoverGizmoCubeInstance == null || targetBlock == null)
             return;
 
         if (_selectedBlock != null && targetBlock == _selectedBlock)
         {
-            HideHoverGizmoCube();
+            hideHoverGizmoCube();
             return;
         }
 
-        ShowGizmoCube(_hoverGizmoCubeInstance, targetBlock, _hoverScale);
+        showGizmoCube(_hoverGizmoCubeInstance, targetBlock, _hoverScale);
     }
 
-    private void UpdateSelectGizmoCube(BlockController targetBlock)
+    private void updateSelectGizmoCube(BlockController targetBlock)
     {
         if (_selectGizmoCubeInstance == null || targetBlock == null)
             return;
 
-        ShowGizmoCube(_selectGizmoCubeInstance, targetBlock, _selectScale);
+        showGizmoCube(_selectGizmoCubeInstance, targetBlock, _selectScale);
     }
 
-    private void ShowGizmoCube(GameObject gizmoCube, BlockController targetBlock, float scale)
+    private void showGizmoCube(GameObject gizmoCube, BlockController targetBlock, float scale)
     {
         gizmoCube.transform.SetParent(targetBlock.transform);
         gizmoCube.transform.localPosition = Vector3.zero;
@@ -225,7 +248,7 @@ public class BlockSelector : MonoBehaviour
         gizmoCube.SetActive(true);
     }
 
-    private void HideHoverGizmoCube()
+    private void hideHoverGizmoCube()
     {
         if (_hoverGizmoCubeInstance != null)
         {
@@ -234,7 +257,7 @@ public class BlockSelector : MonoBehaviour
         }
     }
 
-    private void HideSelectGizmoCube()
+    private void hideSelectGizmoCube()
     {
         if (_selectGizmoCubeInstance != null)
         {
@@ -263,7 +286,7 @@ public class BlockSelector : MonoBehaviour
         }
 
         _selectedBlock = null;
-        HideHoverGizmoCube();
-        HideSelectGizmoCube();
+        hideHoverGizmoCube();
+        hideSelectGizmoCube();
     }
 }

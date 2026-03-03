@@ -25,7 +25,7 @@ public class BuildingSystemManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            InitializeSystem();
+            initializeSystem();
         }
         else
         {
@@ -33,12 +33,14 @@ public class BuildingSystemManager : MonoBehaviour
         }
     }
 
-    private void InitializeSystem()
+    private void initializeSystem()
     {
         if (MaterialInventory == null)
         {
             MaterialInventory = gameObject.AddComponent<MaterialInventory>();
         }
+
+        MaterialInventory.InitializeMaterials();
 
         if (BuildingLevelManager == null)
         {

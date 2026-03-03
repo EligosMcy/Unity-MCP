@@ -13,10 +13,10 @@ public class MaterialItemUI : MonoBehaviour
     private MaterialType _materialType;
     private Action<MaterialType> _onAddClicked;
 
-    public void Initialize(MaterialType materialType, int count, Action<MaterialType> onAddClicked)
+    public void Initialize(MaterialType materialType, int count, Action<MaterialType> onAddClickedAction)
     {
         _materialType = materialType;
-        _onAddClicked = onAddClicked;
+        _onAddClicked = onAddClickedAction;
 
         if (MaterialNameText != null)
         {
@@ -30,11 +30,11 @@ public class MaterialItemUI : MonoBehaviour
 
         if (AddButton != null)
         {
-            AddButton.onClick.AddListener(OnAddClicked);
+            AddButton.onClick.AddListener(onAddClicked);
         }
     }
 
-    private void OnAddClicked()
+    private void onAddClicked()
     {
         _onAddClicked?.Invoke(_materialType);
     }

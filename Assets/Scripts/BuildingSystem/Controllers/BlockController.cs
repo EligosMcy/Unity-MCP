@@ -2,10 +2,13 @@ using UnityEngine;
 
 public class BlockController : MonoBehaviour
 {
+    private const string BaseColor = "_BaseColor";
+
     private BlockData _blockData;
     private Renderer _renderer;
     private bool _isHovered = false;
     private Color _originalColor;
+    private MaterialPropertyBlock _propertyBlock;
 
     public BlockData BlockData => _blockData;
 
@@ -13,6 +16,7 @@ public class BlockController : MonoBehaviour
     {
         _blockData = blockData;
         _renderer = GetComponent<Renderer>();
+        _propertyBlock = new MaterialPropertyBlock();
 
         if (_renderer != null)
         {
@@ -22,9 +26,10 @@ public class BlockController : MonoBehaviour
 
     public void SetColor(Color newColor)
     {
-        if (_renderer != null)
+        if (_renderer != null && _propertyBlock != null)
         {
-            _renderer.material.color = newColor;
+            _propertyBlock.SetColor(BaseColor, newColor);
+            _renderer.SetPropertyBlock(_propertyBlock);
             _originalColor = newColor;
         }
     }
@@ -36,19 +41,22 @@ public class BlockController : MonoBehaviour
 
     public void OnHoverEnter()
     {
-        if (_renderer != null && !_isHovered)
+        if (_renderer != null && _propertyBlock != null && !_isHovered)
         {
             _isHovered = true;
-            _renderer.material.color = Color.Lerp(_originalColor, Color.white, 0.3f);
+            Color hoverColor = Color.Lerp(_originalColor, Color.white, 0.3f);
+            _propertyBlock.SetColor(BaseColor, hoverColor);
+            _renderer.SetPropertyBlock(_propertyBlock);
         }
     }
 
     public void OnHoverExit()
     {
-        if (_renderer != null && _isHovered)
+        if (_renderer != null && _propertyBlock != null && _isHovered)
         {
             _isHovered = false;
-            _renderer.material.color = _originalColor;
+            _propertyBlock.SetColor(BaseColor, _originalColor);
+            _renderer.SetPropertyBlock(_propertyBlock);
         }
     }
 }

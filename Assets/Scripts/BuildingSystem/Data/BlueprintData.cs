@@ -38,17 +38,17 @@ public class BlueprintData : ScriptableObject
         get
         {
             if (_materialRequirementsCache == null)
-                RebuildCache();
+                rebuildCache();
             return _materialRequirementsCache;
         }
     }
 
     private void OnEnable()
     {
-        RebuildCache();
+        rebuildCache();
     }
 
-    private void RebuildCache()
+    private void rebuildCache()
     {
         _materialRequirementsCache = new Dictionary<MaterialType, int>();
         if (MaterialRequirementList == null) return;
@@ -72,7 +72,7 @@ public class BlueprintData : ScriptableObject
         foreach (var kv in temp)
             MaterialRequirementList.Add(new MaterialRequirementEntry { materialType = kv.Key, amount = kv.Value });
 
-        RebuildCache();
+        rebuildCache();
     }
 
     public int GetTotalBlockCount()

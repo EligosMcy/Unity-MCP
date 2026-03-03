@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.InputSystem;
 
 public class BuildingUI : MonoBehaviour
 {
@@ -43,26 +42,25 @@ public class BuildingUI : MonoBehaviour
     public TextMeshProUGUI ErrorText;
     public Button ErrorOkButton;
 
-    [Header("Input Controls")]
-    public InputActionProperty ModeSwitchInputActionProperty;
-
     [Header("Color Picker")]
     public ColorPickerUI ColorPickerUI;
 
     private BuildingSystemPresenter _presenter;
     private BuildingStateManager _stateManager;
     private BuildingSystemManager _systemManager;
+    private BuildingInputProvider _inputProvider;
     private List<BlueprintData> _availableBlueprints;
+    private Dictionary<MaterialType, MaterialItemUI> _materialItemCache = new Dictionary<MaterialType, MaterialItemUI>();
 
     private void Awake()
     {
-        InitializeUI();
+        initializeUI();
     }
 
     private void Start()
     {
-        LoadBlueprints();
-        SetupInput();
+        loadBlueprints();
+        setupInput();
     }
 
     public void Initialize(BuildingSystemManager systemManager)
@@ -82,115 +80,117 @@ public class BuildingUI : MonoBehaviour
         _stateManager = stateManager;
     }
 
-    private void InitializeUI()
+    private void initializeUI()
     {
         if (BuildButton != null)
-            BuildButton.onClick.AddListener(OnBuildButtonClicked);
+            BuildButton.onClick.AddListener(onBuildButtonClicked);
 
         if (ClearButton != null)
-            ClearButton.onClick.AddListener(OnClearButtonClicked);
+            ClearButton.onClick.AddListener(onClearButtonClicked);
 
         if (AddAllMaterialsButton != null)
-            AddAllMaterialsButton.onClick.AddListener(OnAddAllMaterialsClicked);
+            AddAllMaterialsButton.onClick.AddListener(onAddAllMaterialsClicked);
 
         if (IncreaseWoodworkingButton != null)
-            IncreaseWoodworkingButton.onClick.AddListener(OnIncreaseWoodworkingClicked);
+            IncreaseWoodworkingButton.onClick.AddListener(onIncreaseWoodworkingClicked);
 
         if (IncreaseConstructionButton != null)
-            IncreaseConstructionButton.onClick.AddListener(OnIncreaseConstructionClicked);
+            IncreaseConstructionButton.onClick.AddListener(onIncreaseConstructionClicked);
 
         if (ErrorOkButton != null)
-            ErrorOkButton.onClick.AddListener(OnErrorOkClicked);
+            ErrorOkButton.onClick.AddListener(onErrorOkClicked);
 
         if (MapXInput != null)
-            MapXInput.onEndEdit.AddListener(OnMapXChanged);
+            MapXInput.onEndEdit.AddListener(onMapXChanged);
 
         if (MapYInput != null)
-            MapYInput.onEndEdit.AddListener(OnMapYChanged);
+            MapYInput.onEndEdit.AddListener(onMapYChanged);
 
         if (ColorPickerUI != null)
-            ColorPickerUI.OnColorApplied += OnColorApplied;
+            ColorPickerUI.OnColorApplied += onColorApplied;
 
         if (ErrorPanel != null)
             ErrorPanel.SetActive(false);
     }
 
-    private void SetupInput()
+    private void setupInput()
     {
-        if (ModeSwitchInputActionProperty != null && ModeSwitchInputActionProperty.action != null)
+        if (_systemManager != null)
         {
-            ModeSwitchInputActionProperty.action.performed += OnModeSwitchPerformed;
-            ModeSwitchInputActionProperty.action.Enable();
+            _inputProvider = _systemManager.GetComponent<BuildingInputProvider>();
+            if (_inputProvider != null)
+            {
+                _inputProvider.OnModeSwitched += onModeSwitchPerformed;
+            }
         }
     }
 
     private void OnDestroy()
     {
-        if (ModeSwitchInputActionProperty != null && ModeSwitchInputActionProperty.action != null)
+        if (_inputProvider != null)
         {
-            ModeSwitchInputActionProperty.action.performed -= OnModeSwitchPerformed;
-            ModeSwitchInputActionProperty.action.Disable();
+            _inputProvider.OnModeSwitched -= onModeSwitchPerformed;
         }
 
         if (ColorPickerUI != null)
-            ColorPickerUI.OnColorApplied -= OnColorApplied;
+            ColorPickerUI.OnColorApplied -= onColorApplied;
 
         _presenter?.Cleanup();
     }
 
-    private void LoadBlueprints()
+    private void loadBlueprints()
     {
         _availableBlueprints = new List<BlueprintData>();
         foreach (var bp in Resources.LoadAll<BlueprintData>("Blueprints"))
         {
             _availableBlueprints.Add(bp);
-            CreateBlueprintItem(bp);
+            createBlueprintItem(bp);
         }
     }
 
-    private void CreateBlueprintItem(BlueprintData blueprint)
+    private void createBlueprintItem(BlueprintData blueprint)
     {
         if (BlueprintItemPrefab == null || BlueprintListContainer == null) return;
         var item = Instantiate(BlueprintItemPrefab, BlueprintListContainer);
-        item.GetComponent<BlueprintItemUI>()?.Initialize(blueprint, OnBlueprintItemClicked);
+        item.GetComponent<BlueprintItemUI>()?.Initialize(blueprint, onBlueprintItemClicked);
     }
 
-    private void OnBlueprintItemClicked(BlueprintData blueprint)
+    private void onBlueprintItemClicked(BlueprintData blueprint)
     {
         _presenter?.OnBlueprintSelected(blueprint);
     }
 
-    private void OnBuildButtonClicked()
+    private void onBuildButtonClicked()
     {
         _presenter?.OnBuildButtonClicked();
     }
 
-    private void OnClearButtonClicked()
+    private void onClearButtonClicked()
     {
         _presenter?.OnClearButtonClicked();
     }
 
-    private void OnAddAllMaterialsClicked()
+    private void onAddAllMaterialsClicked()
     {
         _presenter?.OnAddAllMaterialsClicked();
     }
 
-    private void OnIncreaseWoodworkingClicked()
+    private void onIncreaseWoodworkingClicked()
     {
         _presenter?.OnIncreaseWoodworkingClicked();
     }
 
-    private void OnIncreaseConstructionClicked()
+    private void onIncreaseConstructionClicked()
     {
         _presenter?.OnIncreaseConstructionClicked();
     }
 
-    private void OnModeSwitchPerformed(InputAction.CallbackContext context)
+    private void onModeSwitchPerformed()
     {
         _presenter?.OnModeToggleClicked();
     }
 
-    private void OnMapXChanged(string value)
+    private void onMapXChanged(string value)
     {
         if (int.TryParse(value, out int x))
         {
@@ -198,7 +198,7 @@ public class BuildingUI : MonoBehaviour
         }
     }
 
-    private void OnMapYChanged(string value)
+    private void onMapYChanged(string value)
     {
         if (int.TryParse(value, out int y))
         {
@@ -206,18 +206,18 @@ public class BuildingUI : MonoBehaviour
         }
     }
 
-    private void OnColorApplied(Color color)
+    private void onColorApplied(Color color)
     {
         _presenter?.OnColorApplied(color);
     }
 
-    private void OnErrorOkClicked()
+    private void onErrorOkClicked()
     {
         if (ErrorPanel != null)
             ErrorPanel.SetActive(false);
     }
 
-    private void OnAddMaterialClicked(MaterialType materialType)
+    private void onAddMaterialClicked(MaterialType materialType)
     {
         _presenter?.OnAddMaterialClicked(materialType);
     }
@@ -225,14 +225,45 @@ public class BuildingUI : MonoBehaviour
     public void UpdateMaterialDisplay()
     {
         if (MaterialListContainer == null || MaterialItemPrefab == null) return;
-        foreach (Transform child in MaterialListContainer) Destroy(child.gameObject);
 
-        if (_systemManager?.MaterialInventory == null) return;
+        if (_systemManager.MaterialInventory == null) return;
 
-        foreach (var mat in _systemManager.MaterialInventory.GetAllMaterials())
+        var materials = _systemManager.MaterialInventory.GetAllMaterials();
+        var processedTypes = new HashSet<MaterialType>();
+
+        foreach (var mat in materials)
         {
-            var item = Instantiate(MaterialItemPrefab, MaterialListContainer);
-            item.GetComponent<MaterialItemUI>()?.Initialize(mat.Key, mat.Value, OnAddMaterialClicked);
+            processedTypes.Add(mat.Key);
+
+            if (_materialItemCache.TryGetValue(mat.Key, out var existingItem))
+            {
+                existingItem.UpdateCount(mat.Value);
+            }
+            else
+            {
+                var item = Instantiate(MaterialItemPrefab, MaterialListContainer);
+                var ui = item.GetComponent<MaterialItemUI>();
+                ui.Initialize(mat.Key, mat.Value, onAddMaterialClicked);
+                _materialItemCache[mat.Key] = ui;
+            }
+        }
+
+        var toRemove = new List<MaterialType>();
+        foreach (var key in _materialItemCache.Keys)
+        {
+            if (!processedTypes.Contains(key))
+            {
+                toRemove.Add(key);
+            }
+        }
+
+        foreach (var type in toRemove)
+        {
+            if (_materialItemCache.TryGetValue(type, out var item))
+            {
+                Destroy(item.gameObject);
+                _materialItemCache.Remove(type);
+            }
         }
     }
 

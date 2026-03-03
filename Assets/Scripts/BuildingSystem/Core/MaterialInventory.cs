@@ -8,12 +8,7 @@ public class MaterialInventory : MonoBehaviour, IMaterialInventory
 
     public event Action<MaterialType, int> OnMaterialChanged;
 
-    private void Awake()
-    {
-        InitializeMaterials();
-    }
-
-    private void InitializeMaterials()
+    public void InitializeMaterials()
     {
         _materials = new Dictionary<MaterialType, int>();
         
@@ -25,9 +20,9 @@ public class MaterialInventory : MonoBehaviour, IMaterialInventory
 
     public int GetMaterialCount(MaterialType materialType)
     {
-        if (_materials.ContainsKey(materialType))
+        if (_materials.TryGetValue(materialType, out var count))
         {
-            return _materials[materialType];
+            return count;
         }
         return 0;
     }

@@ -159,5 +159,5 @@ MonoBehaviour:
     amount: 21
   - materialType: 0
     amount: 6
-  RequiredLevel: {fileID: 0}
+  RequiredLevel: {fileID: 11400000, guid: 7607c395a5ec24f4b8676a43d4e8f7a3, type: 2}
   Description: A bridge across a river

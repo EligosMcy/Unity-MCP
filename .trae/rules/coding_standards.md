@@ -14,6 +14,9 @@
 - **Unity生命周期方法**: 遵循Unity官方命名规范（PascalCase）
   - 示例: `Awake()`, `Start()`, `Update()`, `OnCollisionEnter()`, `OnEnable()`, `OnDisable()`
   - **注意**: Unity生命周期方法不受私有方法命名规则限制，必须使用Unity官方定义的名称
+- **事件回调方法**: 虽然以 "On" 开头，但仍遵循私有方法命名规则（camelCase）
+  - 示例: `onPlayerClicked()`, `onModeChanged()`, `onMaterialAdded()`
+  - **注意**: 事件回调方法作为私有方法使用，必须使用小写字母开头
 
 ### 变量名
 - **公共变量**: 使用 PascalCase

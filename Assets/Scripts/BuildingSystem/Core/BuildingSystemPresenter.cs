@@ -19,67 +19,67 @@ public class BuildingSystemPresenter
 
     public void Initialize()
     {
-        SubscribeToEvents();
+        subscribeToEvents();
         _ui.SetPresenter(this);
         _ui.SetStateManager(_stateManager);
         _ui.UpdateMaterialDisplay();
         _ui.UpdateLevelDisplay();
     }
 
-    private void SubscribeToEvents()
+    private void subscribeToEvents()
     {
         if (_systemManager.MaterialInventory != null)
         {
-            _systemManager.MaterialInventory.OnMaterialChanged += OnMaterialChanged;
+            _systemManager.MaterialInventory.OnMaterialChanged += onMaterialChanged;
         }
 
         if (_systemManager.BuildingLevelManager != null)
         {
-            _systemManager.BuildingLevelManager.OnWoodworkingLevelChanged += OnWoodworkingLevelChanged;
-            _systemManager.BuildingLevelManager.OnConstructionLevelChanged += OnConstructionLevelChanged;
+            _systemManager.BuildingLevelManager.OnWoodworkingLevelChanged += onWoodworkingLevelChanged;
+            _systemManager.BuildingLevelManager.OnConstructionLevelChanged += onConstructionLevelChanged;
         }
 
         if (_systemManager.BuildingExecutor != null)
         {
-            _systemManager.BuildingExecutor.OnBuildingStarted += OnBuildingStarted;
-            _systemManager.BuildingExecutor.OnBuildingCompleted += OnBuildingCompleted;
-            _systemManager.BuildingExecutor.OnBuildingProgress += OnBuildingProgress;
-            _systemManager.BuildingExecutor.OnBuildingError += OnBuildingError;
-            _systemManager.BuildingExecutor.OnBuildingPaused += OnBuildingPaused;
-            _systemManager.BuildingExecutor.OnBuildingResumed += OnBuildingResumed;
+            _systemManager.BuildingExecutor.OnBuildingStarted += onBuildingStarted;
+            _systemManager.BuildingExecutor.OnBuildingCompleted += onBuildingCompleted;
+            _systemManager.BuildingExecutor.OnBuildingProgress += onBuildingProgress;
+            _systemManager.BuildingExecutor.OnBuildingError += onBuildingError;
+            _systemManager.BuildingExecutor.OnBuildingPaused += onBuildingPaused;
+            _systemManager.BuildingExecutor.OnBuildingResumed += onBuildingResumed;
         }
 
-        _stateManager.OnModeChanged += HandleModeChanged;
-        _stateManager.OnBlueprintSelected += HandleBlueprintSelectedFromState;
-        _stateManager.OnMapPositionChanged += HandleMapPositionChanged;
+        _stateManager.OnModeChanged += handleModeChanged;
+        _stateManager.OnBlueprintSelected += handleBlueprintSelectedFromState;
+        _stateManager.OnMapPositionChanged += handleMapPositionChanged;
     }
 
-    private void UnsubscribeFromEvents()
+    private void unsubscribeFromEvents()
     {
         if (_systemManager.MaterialInventory != null)
         {
-            _systemManager.MaterialInventory.OnMaterialChanged -= OnMaterialChanged;
+            _systemManager.MaterialInventory.OnMaterialChanged -= onMaterialChanged;
         }
 
         if (_systemManager.BuildingLevelManager != null)
         {
-            _systemManager.BuildingLevelManager.OnWoodworkingLevelChanged -= OnWoodworkingLevelChanged;
-            _systemManager.BuildingLevelManager.OnConstructionLevelChanged -= OnConstructionLevelChanged;
+            _systemManager.BuildingLevelManager.OnWoodworkingLevelChanged -= onWoodworkingLevelChanged;
+            _systemManager.BuildingLevelManager.OnConstructionLevelChanged -= onConstructionLevelChanged;
         }
 
         if (_systemManager.BuildingExecutor != null)
         {
-            _systemManager.BuildingExecutor.OnBuildingStarted -= OnBuildingStarted;
-            _systemManager.BuildingExecutor.OnBuildingCompleted -= OnBuildingCompleted;
-            _systemManager.BuildingExecutor.OnBuildingProgress -= OnBuildingProgress;
-            _systemManager.BuildingExecutor.OnBuildingError -= OnBuildingError;
-            _systemManager.BuildingExecutor.OnBuildingPaused -= OnBuildingPaused;
-            _systemManager.BuildingExecutor.OnBuildingResumed -= OnBuildingResumed;
+            _systemManager.BuildingExecutor.OnBuildingStarted -= onBuildingStarted;
+            _systemManager.BuildingExecutor.OnBuildingCompleted -= onBuildingCompleted;
+            _systemManager.BuildingExecutor.OnBuildingProgress -= onBuildingProgress;
+            _systemManager.BuildingExecutor.OnBuildingError -= onBuildingError;
+            _systemManager.BuildingExecutor.OnBuildingPaused -= onBuildingPaused;
+            _systemManager.BuildingExecutor.OnBuildingResumed -= onBuildingResumed;
         }
 
-        _stateManager.OnModeChanged -= HandleModeChanged;
-        _stateManager.OnBlueprintSelected -= HandleBlueprintSelectedFromState;
-        _stateManager.OnMapPositionChanged -= HandleMapPositionChanged;
+        _stateManager.OnModeChanged -= handleModeChanged;
+        _stateManager.OnBlueprintSelected -= handleBlueprintSelectedFromState;
+        _stateManager.OnMapPositionChanged -= handleMapPositionChanged;
     }
 
     public void OnBuildButtonClicked()
@@ -162,25 +162,25 @@ public class BuildingSystemPresenter
         }
     }
 
-    private void OnMaterialChanged(MaterialType type, int count)
+    private void onMaterialChanged(MaterialType type, int count)
     {
         _ui.UpdateMaterialDisplay();
         _ui.UpdateMaterialStatus();
     }
 
-    private void OnWoodworkingLevelChanged(int level)
+    private void onWoodworkingLevelChanged(int level)
     {
         _ui.UpdateLevelDisplay();
         _ui.UpdateLevelStatus();
     }
 
-    private void OnConstructionLevelChanged(int level)
+    private void onConstructionLevelChanged(int level)
     {
         _ui.UpdateLevelDisplay();
         _ui.UpdateLevelStatus();
     }
 
-    private void OnBuildingStarted(BlueprintData blueprint, Vector2Int position)
+    private void onBuildingStarted(BlueprintData blueprint, Vector2Int position)
     {
         if (position == _stateManager.CurrentMapPosition)
         {
@@ -188,7 +188,7 @@ public class BuildingSystemPresenter
         }
     }
 
-    private void OnBuildingCompleted(BlueprintData blueprint, Vector2Int position)
+    private void onBuildingCompleted(BlueprintData blueprint, Vector2Int position)
     {
         if (position == _stateManager.CurrentMapPosition)
         {
@@ -196,7 +196,7 @@ public class BuildingSystemPresenter
         }
     }
 
-    private void OnBuildingProgress(float progress, Vector2Int position)
+    private void onBuildingProgress(float progress, Vector2Int position)
     {
         if (position == _stateManager.CurrentMapPosition)
         {
@@ -204,12 +204,12 @@ public class BuildingSystemPresenter
         }
     }
 
-    private void OnBuildingError(string error)
+    private void onBuildingError(string error)
     {
         _ui.ShowError(error);
     }
 
-    private void OnBuildingPaused(BlueprintData blueprint, Vector2Int position)
+    private void onBuildingPaused(BlueprintData blueprint, Vector2Int position)
     {
         if (position == _stateManager.CurrentMapPosition)
         {
@@ -217,7 +217,7 @@ public class BuildingSystemPresenter
         }
     }
 
-    private void OnBuildingResumed(BlueprintData blueprint, Vector2Int position)
+    private void onBuildingResumed(BlueprintData blueprint, Vector2Int position)
     {
         if (position == _stateManager.CurrentMapPosition)
         {
@@ -225,7 +225,7 @@ public class BuildingSystemPresenter
         }
     }
 
-    private void HandleModeChanged(BuildingMode mode)
+    private void handleModeChanged(BuildingMode mode)
     {
         _ui.UpdateModeDisplay(mode);
 
@@ -239,7 +239,7 @@ public class BuildingSystemPresenter
         }
     }
 
-    private void HandleBlueprintSelectedFromState(BlueprintData blueprint)
+    private void handleBlueprintSelectedFromState(BlueprintData blueprint)
     {
         _ui.UpdateBlueprintInfo(blueprint);
         _ui.UpdateMaterialStatus();
@@ -247,13 +247,13 @@ public class BuildingSystemPresenter
         _ui.UpdateProgressDisplay();
     }
 
-    private void HandleMapPositionChanged(Vector2Int position)
+    private void handleMapPositionChanged(Vector2Int position)
     {
         _ui.UpdateProgressDisplay();
     }
 
     public void Cleanup()
     {
-        UnsubscribeFromEvents();
+        unsubscribeFromEvents();
     }
 }

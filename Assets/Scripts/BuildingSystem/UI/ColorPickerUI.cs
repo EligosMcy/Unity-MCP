@@ -20,42 +20,6 @@ public class ColorPickerUI : MonoBehaviour
 
     private void Awake()
     {
-        // 自动查找UI元素
-        if (Panel == null)
-        {
-            Panel = transform.parent.gameObject;
-        }
-
-        if (PreviewImage == null)
-        {
-            PreviewImage = transform.parent.Find("PreviewImage").GetComponent<Image>();
-        }
-
-        if (RedSlider == null)
-        {
-            RedSlider = transform.parent.Find("RedSlider").GetComponent<Slider>();
-        }
-
-        if (GreenSlider == null)
-        {
-            GreenSlider = transform.parent.Find("GreenSlider").GetComponent<Slider>();
-        }
-
-        if (BlueSlider == null)
-        {
-            BlueSlider = transform.parent.Find("BlueSlider").GetComponent<Slider>();
-        }
-
-        if (ApplyButton == null)
-        {
-            ApplyButton = transform.parent.Find("ApplyButton").GetComponent<Button>();
-        }
-
-        if (CancelButton == null)
-        {
-            CancelButton = transform.parent.Find("CancelButton").GetComponent<Button>();
-        }
-
         if (Panel != null)
         {
             Panel.SetActive(false);
@@ -78,12 +42,12 @@ public class ColorPickerUI : MonoBehaviour
 
         if (ApplyButton != null)
         {
-            ApplyButton.onClick.AddListener(Apply);
+            ApplyButton.onClick.AddListener(apply);
         }
 
         if (CancelButton != null)
         {
-            CancelButton.onClick.AddListener(Cancel);
+            CancelButton.onClick.AddListener(cancel);
         }
     }
 
@@ -154,12 +118,12 @@ public class ColorPickerUI : MonoBehaviour
         }
     }
 
-    private void Apply()
+    private void apply()
     {
         OnColorApplied?.Invoke(_currentColor);
     }
 
-    private void Cancel()
+    private void cancel()
     {
     }
 }

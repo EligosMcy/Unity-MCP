@@ -17,7 +17,7 @@ public class BlockCustomizer : MonoBehaviour
         _blockSelector = GetComponent<BlockSelector>();
         if (_blockSelector != null)
         {
-            _blockSelector.OnBlockClick += HandleBlockClick;
+            _blockSelector.OnBlockClick += handleBlockClick;
         }
         else
         {
@@ -29,11 +29,11 @@ public class BlockCustomizer : MonoBehaviour
     {
         if (_blockSelector != null)
         {
-            _blockSelector.OnBlockClick -= HandleBlockClick;
+            _blockSelector.OnBlockClick -= handleBlockClick;
         }
     }
 
-    private void HandleBlockClick(BlockController block)
+    private void handleBlockClick(BlockController block)
     {
         SelectBlock(block);
     }

@@ -1133,6 +1133,7 @@ MonoBehaviour:
   _selectColor: {r: 0.5764706, g: 0.4392157, b: 0.8588236, a: 1}
   _hoverScale: 1.05
   _selectScale: 1.08
+  _raycastInterval: 0.05
 --- !u!114 &197385844
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3391,26 +3392,6 @@ MonoBehaviour:
   ErrorPanel: {fileID: 981814680}
   ErrorText: {fileID: 199213387}
   ErrorOkButton: {fileID: 31437005}
-  ModeSwitchInputActionProperty:
-    m_UseReference: 0
-    m_Action:
-      m_Name: Mode Switch Input Action Property
-      m_Type: 0
-      m_ExpectedControlType: 
-      m_Id: 9dd54e98-0882-4a8d-b723-c101f97decf8
-      m_Processors: 
-      m_Interactions: 
-      m_SingletonActionBindings:
-      - m_Name: 
-        m_Id: a7170621-9552-48ba-bd0b-8569624fb123
-        m_Path: <Keyboard>/g
-        m_Interactions: 
-        m_Processors: 
-        m_Groups: 
-        m_Action: Mode Switch Input Action Property
-        m_Flags: 0
-      m_Flags: 0
-    m_Reference: {fileID: 0}
   ColorPickerUI: {fileID: 890334142}
 --- !u!1 &704331339
 GameObject:

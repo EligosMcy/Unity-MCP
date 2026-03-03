@@ -16,26 +16,26 @@ public class BlueprintCreator : EditorWindow
 
         if (GUILayout.Button("创建简单房子蓝图"))
         {
-            CreateSimpleHouseBlueprint();
+            createSimpleHouseBlueprint();
         }
 
         if (GUILayout.Button("创建塔楼蓝图"))
         {
-            CreateTowerBlueprint();
+            createTowerBlueprint();
         }
 
         if (GUILayout.Button("创建桥梁蓝图"))
         {
-            CreateBridgeBlueprint();
+            createBridgeBlueprint();
         }
 
         if (GUILayout.Button("创建所有等级要求"))
         {
-            CreateAllLevelRequirements();
+            createAllLevelRequirements();
         }
     }
 
-    private void CreateSimpleHouseBlueprint()
+    private void createSimpleHouseBlueprint()
     {
         BlueprintData blueprint = ScriptableObject.CreateInstance<BlueprintData>();
         blueprint.BlueprintName = "Simple House";
@@ -80,7 +80,7 @@ public class BlueprintCreator : EditorWindow
         Debug.Log($"已创建简单房子蓝图: {path}");
     }
 
-    private void CreateTowerBlueprint()
+    private void createTowerBlueprint()
     {
         BlueprintData blueprint = ScriptableObject.CreateInstance<BlueprintData>();
         blueprint.BlueprintName = "Tower";
@@ -125,7 +125,7 @@ public class BlueprintCreator : EditorWindow
         Debug.Log($"已创建塔楼蓝图: {path}");
     }
 
-    private void CreateBridgeBlueprint()
+    private void createBridgeBlueprint()
     {
         BlueprintData blueprint = ScriptableObject.CreateInstance<BlueprintData>();
         blueprint.BlueprintName = "Bridge";
@@ -165,7 +165,7 @@ public class BlueprintCreator : EditorWindow
         Debug.Log($"已创建桥梁蓝图: {path}");
     }
 
-    private void CreateAllLevelRequirements()
+    private void createAllLevelRequirements()
     {
         BuildingLevelData level1 = ScriptableObject.CreateInstance<BuildingLevelData>();
         level1.Level = 1;

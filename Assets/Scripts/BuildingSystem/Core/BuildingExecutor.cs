@@ -103,10 +103,10 @@ public class BuildingExecutor : MonoBehaviour, IBuildingExecutor
 
         _activeSessionKey = mapPosition;
         _isBuilding = true;
-        StartCoroutine(BuildCoroutine(session));
+        StartCoroutine(buildCoroutine(session));
     }
 
-    private IEnumerator BuildCoroutine(BuildingSession session)
+    private IEnumerator buildCoroutine(BuildingSession session)
     {
         int total = session.blueprint.Blocks.Count;
 
@@ -129,7 +129,7 @@ public class BuildingExecutor : MonoBehaviour, IBuildingExecutor
                 yPos,
                 blockData.Z * session.blueprint.BlockSpacing);
 
-            GameObject block = CreateBlock(blockData, localPos, session.buildingParent.transform);
+            GameObject block = createBlock(blockData, localPos, session.buildingParent.transform);
             if (block != null)
                 session.builtBlocks[new Vector3Int(blockData.X, blockData.Y, blockData.Z)] = block;
 
@@ -145,7 +145,7 @@ public class BuildingExecutor : MonoBehaviour, IBuildingExecutor
         OnBuildingCompleted?.Invoke(session.blueprint, session.mapPosition);
     }
 
-    private GameObject CreateBlock(BlockData blockData, Vector3 localPosition, Transform parent)
+    private GameObject createBlock(BlockData blockData, Vector3 localPosition, Transform parent)
     {
         if (BlockPrefab == null) { Debug.LogError("方块预制体未设置"); return null; }
         GameObject block = Instantiate(BlockPrefab, parent);

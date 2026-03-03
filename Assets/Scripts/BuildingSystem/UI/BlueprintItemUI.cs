@@ -30,11 +30,11 @@ public class BlueprintItemUI : MonoBehaviour
 
         if (SelectButton != null)
         {
-            SelectButton.onClick.AddListener(OnSelectClicked);
+            SelectButton.onClick.AddListener(onSelectClicked);
         }
     }
 
-    private void OnSelectClicked()
+    private void onSelectClicked()
     {
         _onSelected?.Invoke(_blueprint);
     }
