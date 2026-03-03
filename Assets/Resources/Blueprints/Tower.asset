@@ -351,5 +351,5 @@ MonoBehaviour:
     amount: 32
   - materialType: 3
     amount: 1
-  RequiredLevel: {fileID: 0}
+  RequiredLevel: {fileID: 11400000, guid: 0845c613b2141dd49ac31bd49effe88f, type: 2}
   Description: An 8-story tower

@@ -28,8 +28,15 @@ public class BuildingUI : MonoBehaviour
     public TextMeshProUGUI LevelStatusText;
 
     [Header("Map Coordinate Input")]
-    public TMP_InputField MapXInput;
-    public TMP_InputField MapYInput;
+    public Slider MapXSlider;
+    public Slider MapYSlider;
+    public TextMeshProUGUI MapXValueText;
+    public TextMeshProUGUI MapYValueText;
+
+    [Header("Position Preview")]
+    public GameObject GizmoCubePrefab;
+    private GameObject _positionPreviewInstance;
+    private Renderer _positionPreviewRenderer;
 
     [Header("Level Display")]
     public TextMeshProUGUI WoodworkingLevelText;
@@ -55,12 +62,14 @@ public class BuildingUI : MonoBehaviour
     private void Awake()
     {
         initializeUI();
+        createPositionPreview();
     }
 
     private void Start()
     {
         loadBlueprints();
         setupInput();
+        initializeMapSliders();
     }
 
     public void Initialize(BuildingSystemManager systemManager)
@@ -78,6 +87,11 @@ public class BuildingUI : MonoBehaviour
     public void SetStateManager(BuildingStateManager stateManager)
     {
         _stateManager = stateManager;
+        if (_stateManager != null)
+        {
+            _stateManager.OnBlueprintSelected += onBlueprintSelected;
+            _stateManager.OnMapPositionChanged += onMapPositionChangedForPreview;
+        }
     }
 
     private void initializeUI()
@@ -100,11 +114,21 @@ public class BuildingUI : MonoBehaviour
         if (ErrorOkButton != null)
             ErrorOkButton.onClick.AddListener(onErrorOkClicked);
 
-        if (MapXInput != null)
-            MapXInput.onEndEdit.AddListener(onMapXChanged);
+        if (MapXSlider != null)
+         {
+             MapXSlider.minValue = -10;
+             MapXSlider.maxValue = 10;
+             MapXSlider.wholeNumbers = true;
+             MapXSlider.onValueChanged.AddListener(onMapXChanged);
+         }
 
-        if (MapYInput != null)
-            MapYInput.onEndEdit.AddListener(onMapYChanged);
+         if (MapYSlider != null)
+         {
+             MapYSlider.minValue = -10;
+             MapYSlider.maxValue = 10;
+             MapYSlider.wholeNumbers = true;
+             MapYSlider.onValueChanged.AddListener(onMapYChanged);
+         }
 
         if (ColorPickerUI != null)
             ColorPickerUI.OnColorApplied += onColorApplied;
@@ -135,7 +159,23 @@ public class BuildingUI : MonoBehaviour
         if (ColorPickerUI != null)
             ColorPickerUI.OnColorApplied -= onColorApplied;
 
+        if (_stateManager != null)
+        {
+            _stateManager.OnBlueprintSelected -= onBlueprintSelected;
+            _stateManager.OnMapPositionChanged -= onMapPositionChangedForPreview;
+        }
+
         _presenter?.Cleanup();
+    }
+
+    private void onBlueprintSelected(BlueprintData blueprint)
+    {
+        updatePositionPreviewSize(blueprint);
+    }
+
+    private void onMapPositionChangedForPreview(Vector2Int position)
+    {
+        updatePositionPreview(position.x, position.y);
     }
 
     private void loadBlueprints()
@@ -190,20 +230,110 @@ public class BuildingUI : MonoBehaviour
         _presenter?.OnModeToggleClicked();
     }
 
-    private void onMapXChanged(string value)
+    private void onMapXChanged(float value)
     {
-        if (int.TryParse(value, out int x))
+        int x = Mathf.RoundToInt(value);
+        int y = _stateManager?.CurrentMapPosition.y ?? 0;
+        updateMapXValueText(x);
+        updatePositionPreview(x, y);
+        _presenter?.OnMapPositionChanged(x, y);
+    }
+
+    private void onMapYChanged(float value)
+    {
+        int x = _stateManager?.CurrentMapPosition.x ?? 0;
+        int y = Mathf.RoundToInt(value);
+        updateMapYValueText(y);
+        updatePositionPreview(x, y);
+        _presenter?.OnMapPositionChanged(x, y);
+    }
+
+    private void initializeMapSliders()
+    {
+        int startX = _stateManager?.CurrentMapPosition.x ?? 0;
+        int startY = _stateManager?.CurrentMapPosition.y ?? 0;
+
+        if (MapXSlider != null)
         {
-            _presenter?.OnMapPositionChanged(x, _stateManager?.CurrentMapPosition.y ?? 0);
+            MapXSlider.value = startX;
+            updateMapXValueText(startX);
+        }
+
+        if (MapYSlider != null)
+        {
+            MapYSlider.value = startY;
+            updateMapYValueText(startY);
+        }
+
+        updatePositionPreview(startX, startY);
+        updatePositionPreviewSize(_stateManager?.SelectedBlueprint);
+    }
+
+    private void updateMapXValueText(int value)
+    {
+        if (MapXValueText != null)
+            MapXValueText.text = value.ToString();
+    }
+
+    private void updateMapYValueText(int value)
+    {
+        if (MapYValueText != null)
+            MapYValueText.text = value.ToString();
+    }
+
+    private void updatePositionPreview(int x, int y)
+    {
+        if (_positionPreviewInstance != null)
+        {
+            float height = getCurrentBlueprintHeight();
+            _positionPreviewInstance.transform.position = new Vector3(x, height / 2.0f, y);
+        }
+
+        if (_positionPreviewRenderer != null)
+        {
+            _positionPreviewRenderer.enabled = true;
         }
     }
 
-    private void onMapYChanged(string value)
+    private float getCurrentBlueprintHeight()
     {
-        if (int.TryParse(value, out int y))
+        if (_stateManager?.SelectedBlueprint != null)
         {
-            _presenter?.OnMapPositionChanged(_stateManager?.CurrentMapPosition.x ?? 0, y);
+            return _stateManager.SelectedBlueprint.Height;
         }
+        return 1f;
+    }
+
+    private void createPositionPreview()
+    {
+        if (GizmoCubePrefab != null)
+        {
+            _positionPreviewInstance = Instantiate(GizmoCubePrefab);
+            _positionPreviewRenderer = _positionPreviewInstance.GetComponent<Renderer>();
+            _positionPreviewRenderer.enabled = false;
+        }
+    }
+
+    private void updatePositionPreviewSize(BlueprintData blueprint)
+    {
+        if (_positionPreviewInstance == null) return;
+
+        int width = 1;
+        int height = 1;
+        int depth = 1;
+
+        if (blueprint != null)
+        {
+            width = blueprint.Width;
+            height = blueprint.Height;
+            depth = blueprint.Depth;
+        }
+
+        _positionPreviewInstance.transform.localScale = new Vector3(width, height, depth);
+
+        int currentX = _stateManager?.CurrentMapPosition.x ?? 0;
+        int currentY = _stateManager?.CurrentMapPosition.y ?? 0;
+        _positionPreviewInstance.transform.position = new Vector3(currentX, height / 2.0f, currentY);
     }
 
     private void onColorApplied(Color color)
@@ -335,6 +465,7 @@ public class BuildingUI : MonoBehaviour
                 if (BlueprintPanel != null) BlueprintPanel.SetActive(false);
                 if (MaterialPanel != null) MaterialPanel.SetActive(false);
                 if (BuildControlPanel != null) BuildControlPanel.SetActive(false);
+                if (_positionPreviewRenderer != null) _positionPreviewRenderer.enabled = false;
                 break;
 
             case BuildingMode.Build:
@@ -342,6 +473,7 @@ public class BuildingUI : MonoBehaviour
                 if (BlueprintPanel != null) BlueprintPanel.SetActive(true);
                 if (MaterialPanel != null) MaterialPanel.SetActive(true);
                 if (BuildControlPanel != null) BuildControlPanel.SetActive(true);
+                if (_positionPreviewRenderer != null) _positionPreviewRenderer.enabled = true;
                 break;
         }
     }

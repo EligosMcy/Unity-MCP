@@ -314,5 +314,5 @@ MonoBehaviour:
     amount: 25
   - materialType: 0
     amount: 33
-  RequiredLevel: {fileID: 0}
+  RequiredLevel: {fileID: 11400000, guid: e373da4c89386c04289fa4ff40e00075, type: 2}
   Description: A simple 3x3 house with a roof
