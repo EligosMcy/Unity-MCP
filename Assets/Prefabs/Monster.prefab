@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc611fa837a35c747af9d314cb6b1662, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerDefense.Monster
-  _maxHealth: 30
+  _maxHealth: 120
   _attackDamage: 10
   _moveSpeed: 3
   _attackRange: 2

@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bac171bcc3208846a0f7952fabe8448, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerDefense.Bullet
-  _speed: 20
+  _speed: 80
   _lifetime: 3
   _damage: 15
 --- !u!135 &500656333081804756

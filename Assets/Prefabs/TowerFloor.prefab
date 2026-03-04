@@ -70,7 +70,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerDefense.TowerFloor
   _maxHealth: 100
-  _healthBarOffset: 1.5
 --- !u!33 &6513396150030278022
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -204,8 +203,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5761fe3f5c02d24db772edc0c93c273, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerDefense.Turret
-  _rotationSpeed: 45
+  _rotationSpeed: 360
   _attackRange: 15
   _attackInterval: 1
   _firePoint: {fileID: 6532422414078704751}
   _rangeIndicatorMaterial: {fileID: 0}
+  _showRangeIndicator: 1
+  _aimThreshold: 0.99

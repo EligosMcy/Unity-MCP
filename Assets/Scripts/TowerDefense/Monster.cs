@@ -7,6 +7,8 @@ namespace TowerDefense
         [SerializeField] private int _maxHealth = 100;
         [SerializeField] private int _attackDamage = 10;
         [SerializeField] private float _moveSpeed = 3f;
+        [SerializeField] private float _jumpHeight = 2.0f;
+        [SerializeField] private float _jumpFrequency = 5.0f;
         [SerializeField] private float _attackRange = 2f;
         [SerializeField] private float _attackInterval = 1f;
 
@@ -14,6 +16,7 @@ namespace TowerDefense
         private Transform _targetTower;
         private float _attackTimer;
         private TowerFloor _targetFloor;
+        private float _baseY;
 
         public int CurrentHealth => _currentHealth;
 
@@ -46,6 +49,7 @@ namespace TowerDefense
             _currentHealth = _maxHealth;
             _attackTimer = 0;
             transform.localScale = Vector3.one * 1.5f;
+            _baseY = transform.position.y;
         }
 
         private void Update()
@@ -54,7 +58,10 @@ namespace TowerDefense
 
             if (_targetTower != null)
             {
-                float distance = Vector3.Distance(transform.position, _targetTower.position);
+                // Calculate horizontal distance (ignore Y axis) to prevent jump height from affecting range check
+                Vector3 horizontalPos = new Vector3(transform.position.x, 0, transform.position.z);
+                Vector3 targetHorizontalPos = new Vector3(_targetTower.position.x, 0, _targetTower.position.z);
+                float distance = Vector3.Distance(horizontalPos, targetHorizontalPos);
                 
                 if (distance > _attackRange)
                 {
@@ -71,8 +78,20 @@ namespace TowerDefense
         {
             Vector3 direction = (_targetTower.position - transform.position).normalized;
             direction.y = 0;
-            transform.position += direction * _moveSpeed * Time.deltaTime;
-            transform.LookAt(_targetTower);
+            
+            // Apply horizontal movement
+            Vector3 newPos = transform.position + direction * _moveSpeed * Time.deltaTime;
+            
+            // Apply jump
+            float jumpOffset = Mathf.Abs(Mathf.Sin(Time.time * _jumpFrequency)) * _jumpHeight;
+            newPos.y = _baseY + jumpOffset;
+            
+            transform.position = newPos;
+            
+            // Look at target but keep upright
+            Vector3 targetLookPos = _targetTower.position;
+            targetLookPos.y = transform.position.y;
+            transform.LookAt(targetLookPos);
         }
 
         private void AttackTower()
