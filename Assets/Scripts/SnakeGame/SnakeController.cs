@@ -146,14 +146,14 @@ public class SnakeController : MonoBehaviour
         _uiManager.SetScore(_score);
 
         // 初始化身体动画事件
-        InitializeBodyEvents();
+        initializeBodyEvents();
 
         // 设置游戏状态为Start
-        SetGameState(GameState.Start);
+        setGameState(GameState.Start);
     }
 
     // 设置游戏状态
-    void SetGameState(GameState state)
+    void setGameState(GameState state)
     {
         _currentState = state;
 
@@ -207,14 +207,14 @@ public class SnakeController : MonoBehaviour
         _uiManager.SetScore(_score);
 
         // 重置蛇的位置和长度
-        ResetSnake();
+        resetSnake();
 
         // 设置游戏状态为Playing
-        SetGameState(GameState.Playing);
+        setGameState(GameState.Playing);
     }
 
     // 重置蛇
-    void ResetSnake()
+    void resetSnake()
     {
         // 重置蛇头位置
         _head.transform.localPosition = Vector3.zero;
@@ -249,26 +249,26 @@ public class SnakeController : MonoBehaviour
             // 自动模式下执行寻路
             if (_autoMode)
             {
-                AutoPathfinding();
+                autoPathfinding();
             }
             else
             {
                 // 手动模式下处理输入
-                HandleInput();
+                handleInput();
             }
 
             // 更新移动
             _moveTimer += Time.deltaTime;
             if (_moveTimer >= _gameSetting.MoveInterval)
             {
-                Move();
+                move();
                 _moveTimer = 0.0f;
             }
         }
     }
 
     // 处理玩家输入
-    void HandleInput()
+    void handleInput()
     {
         if (_moveInputActionProperty.action != null)
         {
@@ -303,7 +303,7 @@ public class SnakeController : MonoBehaviour
     }
 
     // 移动蛇
-    void Move()
+    void move()
     {
         // 如果游戏已经结束，不执行移动
         if (_isGameOverCalled)
@@ -319,7 +319,7 @@ public class SnakeController : MonoBehaviour
         _head.transform.DOLocalMove(targetPosition, _moveInterval).SetEase(Ease.Linear);
 
         // 旋转蛇头以匹配移动方向
-        RotateHead();
+        rotateHead();
 
         // 移动蛇身
         if (_bodyManager != null)
@@ -328,16 +328,16 @@ public class SnakeController : MonoBehaviour
         }
 
         // 检测位置碰撞（边界、身体、食物）
-        CheckPositionCollisions(targetPosition);
+        checkPositionCollisions(targetPosition);
     }
 
     // 检测位置碰撞
-    void CheckPositionCollisions(Vector3 targetPosition)
+    void checkPositionCollisions(Vector3 targetPosition)
     {
         // 检测边界碰撞
         if (Mathf.Abs(targetPosition.x) > _boundary || Mathf.Abs(targetPosition.z) > _boundary)
         {
-            GameOver();
+            gameOver();
             return;
         }
 
@@ -347,23 +347,23 @@ public class SnakeController : MonoBehaviour
         {
             if (bodyPart != null && Vector3.Distance(targetPosition, bodyPart.transform.localPosition) < 0.5f)
             {
-                GameOver();
+                gameOver();
                 return;
             }
         }
 
         // 检测食物碰撞
-        CheckFoodCollision(targetPosition);
+        checkFoodCollision(targetPosition);
     }
 
     // 检测食物碰撞
-    void CheckFoodCollision(Vector3 snakePosition)
+    void checkFoodCollision(Vector3 snakePosition)
     {
         // 检测小食物
         GameObject food = _foodManager.GetCurrentFood();
         if (food != null && Vector3.Distance(snakePosition, food.transform.localPosition) < 0.5f)
         {
-            CollectFood();
+            collectFood();
             return;
         }
 
@@ -371,12 +371,12 @@ public class SnakeController : MonoBehaviour
         GameObject bigFood = _foodManager.GetCurrentBigFood();
         if (bigFood != null && Vector3.Distance(snakePosition, bigFood.transform.localPosition) < 0.5f)
         {
-            CollectBigFood();
+            collectBigFood();
         }
     }
 
     // 旋转蛇头以匹配移动方向
-    void RotateHead()
+    void rotateHead()
     {
         if (_head != null)
         {
@@ -406,7 +406,7 @@ public class SnakeController : MonoBehaviour
     }
 
     // 收集食物
-    void CollectFood()
+    void collectFood()
     {
         // 增加得分
         _score++;
@@ -426,7 +426,7 @@ public class SnakeController : MonoBehaviour
     }
 
     // 收集大食物
-    void CollectBigFood()
+    void collectBigFood()
     {
         // 增加得分（大食物分数）
         int bigFoodScore = _foodManager.GetBigFoodScore();
@@ -449,7 +449,7 @@ public class SnakeController : MonoBehaviour
 
 
     // 游戏结束
-    void GameOver()
+    void gameOver()
     {
         // 防止重复调用 GameOver
         if (_isGameOverCalled)
@@ -486,20 +486,20 @@ public class SnakeController : MonoBehaviour
             return;
         }
 
-        SetGameState(GameState.GameOver);
+        setGameState(GameState.GameOver);
     }
 
     // 初始化身体动画事件
-    private void InitializeBodyEvents()
+    private void initializeBodyEvents()
     {
         if (_bodyManager != null)
         {
-            _bodyManager.OnBodyAnimationComplete += OnBodyAnimationComplete;
+            _bodyManager.OnBodyAnimationComplete += onBodyAnimationComplete;
         }
     }
 
     // 身体动画完成回调
-    private void OnBodyAnimationComplete()
+    private void onBodyAnimationComplete()
     {
         // 更新食物管理器的身体段引用
         _foodManager.UpdateBodyPartsReference(_bodyManager.GetBodyParts());
@@ -529,7 +529,7 @@ public class SnakeController : MonoBehaviour
     }
 
     // 自动寻路到食物
-    private void AutoPathfinding()
+    private void autoPathfinding()
     {
         // 使用自动寻路组件计算路径
         if (_autoPathfinding != null)

@@ -14,6 +14,7 @@ namespace TowerDefense
 
         private int _currentHealth;
         private Transform _targetTower;
+        private TowerBase _cachedTowerBase;
         private float _attackTimer;
         private TowerFloor _targetFloor;
         private float _baseY;
@@ -22,10 +23,10 @@ namespace TowerDefense
 
         private void Awake()
         {
-            SetupMesh();
+            setupMesh();
         }
 
-        private void SetupMesh()
+        private void setupMesh()
         {
             MeshFilter meshFilter = GetComponent<MeshFilter>();
             MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
@@ -46,6 +47,10 @@ namespace TowerDefense
         public void Initialize(Transform target)
         {
             _targetTower = target;
+            if (_targetTower != null)
+            {
+                _cachedTowerBase = _targetTower.GetComponent<TowerBase>();
+            }
             _currentHealth = _maxHealth;
             _attackTimer = 0;
             transform.localScale = Vector3.one * 1.5f;
@@ -58,47 +63,47 @@ namespace TowerDefense
 
             if (_targetTower != null)
             {
-                // Calculate horizontal distance (ignore Y axis) to prevent jump height from affecting range check
+                // 计算水平距离（忽略Y轴），防止跳跃高度影响范围检查
                 Vector3 horizontalPos = new Vector3(transform.position.x, 0, transform.position.z);
                 Vector3 targetHorizontalPos = new Vector3(_targetTower.position.x, 0, _targetTower.position.z);
                 float distance = Vector3.Distance(horizontalPos, targetHorizontalPos);
                 
                 if (distance > _attackRange)
                 {
-                    MoveTowardsTower();
+                    moveTowardsTower();
                 }
                 else
                 {
-                    AttackTower();
+                    attackTower();
                 }
             }
         }
 
-        private void MoveTowardsTower()
+        private void moveTowardsTower()
         {
             Vector3 direction = (_targetTower.position - transform.position).normalized;
             direction.y = 0;
             
-            // Apply horizontal movement
+            // 应用水平移动
             Vector3 newPos = transform.position + direction * _moveSpeed * Time.deltaTime;
             
-            // Apply jump
+            // 应用跳跃
             float jumpOffset = Mathf.Abs(Mathf.Sin(Time.time * _jumpFrequency)) * _jumpHeight;
             newPos.y = _baseY + jumpOffset;
             
             transform.position = newPos;
             
-            // Look at target but keep upright
+            // 面向目标但保持直立
             Vector3 targetLookPos = _targetTower.position;
             targetLookPos.y = transform.position.y;
             transform.LookAt(targetLookPos);
         }
 
-        private void AttackTower()
+        private void attackTower()
         {
             if (_attackTimer <= 0)
             {
-                FindClosestFloor();
+                findClosestFloor();
                 if (_targetFloor != null)
                 {
                     _targetFloor.TakeDamage(_attackDamage);
@@ -107,12 +112,11 @@ namespace TowerDefense
             }
         }
 
-        private void FindClosestFloor()
+        private void findClosestFloor()
         {
-            TowerBase towerBase = _targetTower.GetComponent<TowerBase>();
-            if (towerBase != null)
+            if (_cachedTowerBase != null)
             {
-                var floors = towerBase.GetAllFloors();
+                var floors = _cachedTowerBase.GetAllFloors();
                 float closestDistance = float.MaxValue;
                 TowerFloor closestFloor = null;
 
@@ -135,11 +139,11 @@ namespace TowerDefense
             _currentHealth -= damage;
             if (_currentHealth <= 0)
             {
-                Die();
+                die();
             }
         }
 
-        private void Die()
+        private void die()
         {
             if (TowerDefenseGameManager.Instance != null)
             {

@@ -13,6 +13,8 @@ namespace TowerDefense
         [SerializeField] private float _aimThreshold = 0.99f;
 
         private float _attackTimer;
+        private float _findTargetTimer;
+        private const float FIND_TARGET_INTERVAL = 0.2f;
         private Transform _target;
         private GameObject _rangeIndicator;
         private Quaternion _idleRotation;
@@ -30,7 +32,7 @@ namespace TowerDefense
 
         private void Awake()
         {
-            SetupMesh();
+            setupMesh();
 
             if (_firePoint == null)
             {
@@ -56,7 +58,7 @@ namespace TowerDefense
             _idleRotation = transform.rotation;
         }
 
-        private void SetupMesh()
+        private void setupMesh()
         {
             MeshFilter meshFilter = GetComponent<MeshFilter>();
             MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
@@ -79,11 +81,11 @@ namespace TowerDefense
             _attackTimer = _attackInterval;
             if (_showRangeIndicator)
             {
-                CreateRangeIndicator();
+                createRangeIndicator();
             }
         }
 
-        private void CreateRangeIndicator()
+        private void createRangeIndicator()
         {
             _rangeIndicator = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             _rangeIndicator.name = "RangeIndicator";
@@ -119,22 +121,27 @@ namespace TowerDefense
         private void Update()
         {
             _attackTimer -= Time.deltaTime;
+            _findTargetTimer -= Time.deltaTime;
 
-            FindTarget();
+            if (_findTargetTimer <= 0)
+            {
+                findTarget();
+                _findTargetTimer = FIND_TARGET_INTERVAL;
+            }
             
             if (_target != null)
             {
-                bool isFacingTarget = RotateTowardsTarget();
+                bool isFacingTarget = rotateTowardsTarget();
                 
                 if (isFacingTarget && _attackTimer <= 0)
                 {
-                    Fire();
+                    fire();
                     _attackTimer = _attackInterval;
                 }
             }
         }
 
-        private void FindTarget()
+        private void findTarget()
         {
             if (_target != null)
             {
@@ -169,7 +176,7 @@ namespace TowerDefense
             }
         }
 
-        private bool RotateTowardsTarget()
+        private bool rotateTowardsTarget()
         {
             if (_target != null)
             {
@@ -190,7 +197,7 @@ namespace TowerDefense
             return false;
         }
 
-        private void Fire()
+        private void fire()
         {
             if (_target != null && BulletPool.Instance != null)
             {
