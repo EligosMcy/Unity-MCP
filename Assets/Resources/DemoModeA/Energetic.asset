@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3df14445b3b2b364ba9f21a0e5375483, type: 3}
+  m_Name: Energetic
+  m_EditorClassIdentifier: Assembly-CSharp::DemoModeA.EmotionProfile
+  Emotion: 2
+  VoiceRate: 1.2
+  VoiceVolume: 0.8
+  TextLengthBias: 1
+  AffirmationBias: 0
+  EmojiDensity: 0.3
+  EmojiPool:
+  - "\U0001F60A"
+  - "\u2728"
+  PoseId: 2
+  LayerWeight: 1
+  AnimSpeed: 1
+  ExpressIntensity: 0.7
+  AttentionMode: 0
+  TypingSpeed: 13
+  ResponseDelay: 0.4
+  PunctuationStyle: 1
+  VisualPreset: 2
+  VolumeBlendWeight: 0.4

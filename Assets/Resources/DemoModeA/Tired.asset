@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3df14445b3b2b364ba9f21a0e5375483, type: 3}
+  m_Name: Tired
+  m_EditorClassIdentifier: Assembly-CSharp::DemoModeA.EmotionProfile
+  Emotion: 1
+  VoiceRate: 0.7
+  VoiceVolume: 0.5
+  TextLengthBias: 0
+  AffirmationBias: 1
+  EmojiDensity: 0.05
+  EmojiPool:
+  - "\u2026"
+  - "\U0001F62A"
+  - "\U0001F634"
+  PoseId: 1
+  LayerWeight: 1
+  AnimSpeed: 0.6
+  ExpressIntensity: 0.3
+  AttentionMode: 1
+  TypingSpeed: 7
+  ResponseDelay: 1.5
+  PunctuationStyle: 3
+  VisualPreset: 1
+  VolumeBlendWeight: 0.7

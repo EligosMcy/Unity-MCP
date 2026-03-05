@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3df14445b3b2b364ba9f21a0e5375483, type: 3}
+  m_Name: Neutral
+  m_EditorClassIdentifier: Assembly-CSharp::DemoModeA.EmotionProfile
+  Emotion: 0
+  VoiceRate: 1
+  VoiceVolume: 0.7
+  TextLengthBias: 1
+  AffirmationBias: 1
+  EmojiDensity: 0.1
+  EmojiPool:
+  - "\U0001F642"
+  - "\U0001F609"
+  PoseId: 0
+  LayerWeight: 1
+  AnimSpeed: 1
+  ExpressIntensity: 0.5
+  AttentionMode: 0
+  TypingSpeed: 12
+  ResponseDelay: 0.2
+  PunctuationStyle: 1
+  VisualPreset: 0
+  VolumeBlendWeight: 0.5
