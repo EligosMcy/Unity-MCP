@@ -119,6 +119,52 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &122669868
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 122669869}
+  - component: {fileID: 122669870}
+  m_Layer: 0
+  m_Name: Dialogue Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &122669869
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 122669868}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1095517724}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &122669870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 122669868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75f13bfe0b068984a9f53a95c9a2c2e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DemoModeA.DialogueController
+  _randomExtendChanceMin: 0.1
+  _randomExtendChanceMax: 0.2
 --- !u!224 &162500048 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1268144900206320073, guid: bb40619be954caa4da2be00c66485a91, type: 3}
@@ -276,6 +322,10 @@ PrefabInstance:
       propertyPath: _emotion
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 8732891163338708708, guid: bb40619be954caa4da2be00c66485a91, type: 3}
+      propertyPath: _controllerSource
+      value: 
+      objectReference: {fileID: 926745488}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -599,6 +649,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DemoModeA.ChatUIController
   _inputField: {fileID: 0}
   _sendButton: {fileID: 0}
+  _dialogueSource: {fileID: 0}
+  _emotionControllerSource: {fileID: 0}
+  _profileRepositorySource: {fileID: 0}
 --- !u!1 &630587551
 GameObject:
   m_ObjectHideFlags: 0
@@ -936,6 +989,56 @@ MonoBehaviour:
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
   m_ScrollDeltaPerTick: 6
+--- !u!1 &926745486
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 926745487}
+  - component: {fileID: 926745488}
+  m_Layer: 0
+  m_Name: Emotion Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &926745487
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 926745486}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1095517724}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &926745488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 926745486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51270dd2c4e90af42a50a6b33870cc63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DemoModeA.EmotionController
+  _profileRepositorySource: {fileID: 1439401666}
+  _emotionChangeListenerSource:
+  - {fileID: 1030476390}
+  _initialEmotion: 0
+  _memoryMinutes: 5
+  _enableLogs: 1
 --- !u!1 &937532655
 GameObject:
   m_ObjectHideFlags: 0
@@ -1173,6 +1276,10 @@ PrefabInstance:
       propertyPath: _emotion
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 8732891163338708708, guid: bb40619be954caa4da2be00c66485a91, type: 3}
+      propertyPath: _controllerSource
+      value: 
+      objectReference: {fileID: 926745488}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1262,7 +1369,7 @@ GameObject:
   - component: {fileID: 1030476391}
   - component: {fileID: 1030476390}
   m_Layer: 0
-  m_Name: Character
+  m_Name: Character Pressenter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1295,7 +1402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35305d9d935afcb4da11ddcbd6a69058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DemoModeA.CharacterPresenter
-  _animator: {fileID: 0}
+  _animator: {fileID: 1030476391}
   _animSpeedParam: AnimSpeed
   _poseIdParam: PoseId
 --- !u!95 &1030476391
@@ -1329,9 +1436,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1095517724}
-  - component: {fileID: 1095517723}
-  - component: {fileID: 1095517721}
-  - component: {fileID: 1095517725}
   m_Layer: 0
   m_Name: DemoRoot
   m_TagString: Untagged
@@ -1339,35 +1443,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1095517721
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1095517720}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75f13bfe0b068984a9f53a95c9a2c2e2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DemoModeA.DialogueController
-  _randomExtendChanceMin: 0.1
-  _randomExtendChanceMax: 0.2
---- !u!114 &1095517723
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1095517720}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51270dd2c4e90af42a50a6b33870cc63, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DemoModeA.EmotionController
-  _profileRepositorySource: {fileID: 0}
-  _initialEmotion: 0
-  _memoryMinutes: 5
 --- !u!4 &1095517724
 Transform:
   m_ObjectHideFlags: 0
@@ -1381,23 +1456,13 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 926745487}
   - {fileID: 1030476389}
+  - {fileID: 122669869}
+  - {fileID: 1530002684}
+  - {fileID: 1439401665}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1095517725
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1095517720}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f620d31a9f704eb4fa3f78db8c39571a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DemoModeA.ProfileRepositorySource
-  _sets:
-  - {fileID: 11400000, guid: 2e2883e627e550c49b30d87fb5c26363, type: 2}
 --- !u!1001 &1205081027
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1490,6 +1555,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Emotion UI Button_Reset
       objectReference: {fileID: 0}
+    - target: {fileID: 8732891163338708708, guid: bb40619be954caa4da2be00c66485a91, type: 3}
+      propertyPath: _controllerSource
+      value: 
+      objectReference: {fileID: 926745488}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1500,6 +1569,52 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1268144900206320073, guid: bb40619be954caa4da2be00c66485a91, type: 3}
   m_PrefabInstance: {fileID: 1205081027}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1439401664
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1439401665}
+  - component: {fileID: 1439401666}
+  m_Layer: 0
+  m_Name: Profile Repository Source
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1439401665
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1439401664}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1095517724}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1439401666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1439401664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f620d31a9f704eb4fa3f78db8c39571a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DemoModeA.ProfileRepositorySource
+  _sets:
+  - {fileID: 11400000, guid: 165741be1ac984b4a9b1220dc5b03a52, type: 2}
 --- !u!1 &1483278257
 GameObject:
   m_ObjectHideFlags: 0
@@ -1637,6 +1752,53 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1530002683
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1530002684}
+  - component: {fileID: 1530002685}
+  m_Layer: 0
+  m_Name: Emotion Profile Repository
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1530002684
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1530002683}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1095517724}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1530002685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1530002683}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbda8eaba54f5064094f3e2b28d99ed4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DemoModeA.EmotionProfileRepository
+  _entries:
+  - Emotion: 2
+    Profile: {fileID: 11400000, guid: 6502b087b0eb0fe408065274884e85c4, type: 2}
 --- !u!1 &1909883910
 GameObject:
   m_ObjectHideFlags: 0
@@ -2042,6 +2204,10 @@ PrefabInstance:
       propertyPath: _emotion
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 8732891163338708708, guid: bb40619be954caa4da2be00c66485a91, type: 3}
+      propertyPath: _controllerSource
+      value: 
+      objectReference: {fileID: 926745488}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2152,6 +2318,10 @@ PrefabInstance:
       propertyPath: _emotion
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8732891163338708708, guid: bb40619be954caa4da2be00c66485a91, type: 3}
+      propertyPath: _controllerSource
+      value: 
+      objectReference: {fileID: 926745488}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

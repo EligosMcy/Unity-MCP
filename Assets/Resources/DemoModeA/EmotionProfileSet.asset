@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9db4720d033b2fb4b9af0e35b4145270, type: 3}
+  m_Name: EmotionProfileSet
+  m_EditorClassIdentifier: Assembly-CSharp::DemoModeA.EmotionProfileSet
+  Entries:
+  - Emotion: 2
+    Profile: {fileID: 11400000, guid: 6502b087b0eb0fe408065274884e85c4, type: 2}
+  - Emotion: 4
+    Profile: {fileID: 11400000, guid: c8bc854f58336ce4e9d5282d38ad3096, type: 2}
+  - Emotion: 3
+    Profile: {fileID: 11400000, guid: ee5334da4b6acbd4a8122d693879314b, type: 2}
+  - Emotion: 0
+    Profile: {fileID: 11400000, guid: 2ccd4c2936ea3f74a8b391d1b684f2d6, type: 2}
+  - Emotion: 1
+    Profile: {fileID: 11400000, guid: 75589dbb9d826ab458706eac27bd94aa, type: 2}
