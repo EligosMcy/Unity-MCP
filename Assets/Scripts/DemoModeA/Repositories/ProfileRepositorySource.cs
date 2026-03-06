@@ -39,36 +39,10 @@ namespace DemoModeA
                     }
                 }
             }
+            
             if (_map.Count == 0)
             {
-                var loaded = Resources.LoadAll<EmotionProfile>("DemoModeA");
-                if (loaded != null)
-                {
-                    for (int i = 0; i < loaded.Length; i++)
-                    {
-                        var p = loaded[i];
-                        if (p != null && !_map.ContainsKey(p.Emotion))
-                        {
-                            _map.Add(p.Emotion, p);
-                        }
-                    }
-                }
-            }
-            if (_map.Count == 0)
-            {
-                var repo = FindFirstObjectByType<EmotionProfileRepository>();
-                if (repo != null)
-                {
-                    var types = new[] { EmotionType.Neutral, EmotionType.Tired, EmotionType.Energetic, EmotionType.Irritable, EmotionType.Excited };
-                    for (int i = 0; i < types.Length; i++)
-                    {
-                        var p = repo.GetProfile(types[i]);
-                        if (p != null && !_map.ContainsKey(types[i]))
-                        {
-                            _map.Add(types[i], p);
-                        }
-                    }
-                }
+                Debug.LogError($"[{nameof(ProfileRepositorySource)}] No profile sets configured or sets are empty. Please assign EmotionProfileSet assets.", this);
             }
         }
     }

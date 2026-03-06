@@ -17,9 +17,10 @@ namespace DemoModeA
         {
             if (_animator == null)
             {
-                _animator = GetComponent<Animator>();
+                Debug.LogError($"[{nameof(CharacterPresenter)}] Animator is null. Please assign Animator in inspector.", this);
+                return;
             }
-            if (_animator == null || profile == null) return;
+            if (profile == null) return;
             _animator.SetFloat(_animSpeedParam, profile.AnimSpeed);
             _animator.SetInteger(_poseIdParam, profile.PoseId);
         }

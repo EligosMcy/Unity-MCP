@@ -25,13 +25,13 @@ namespace DemoModeA
                 Debug.LogWarning($"[{nameof(EmotionUIButton)}] Button reference is null. Click won't be handled.", this);
             }
 
-            _controller = _controllerSource as IEmotionController ?? FindFirstObjectByType<EmotionController>();
+            _controller = _controllerSource as IEmotionController;
             if (_enableLogs)
             {
                 Debug.Log($"[{nameof(EmotionUIButton)}] Awake. Emotion={_emotion}, Controller={(_controller != null ? _controller.GetType().Name : "null")}", this);
                 if (_controller == null)
                 {
-                    Debug.LogWarning($"[{nameof(EmotionUIButton)}] No IEmotionController found. Click won't change emotion.", this);
+                    Debug.LogError($"[{nameof(EmotionUIButton)}] No IEmotionController found. Please assign ControllerSource.", this);
                 }
             }
 

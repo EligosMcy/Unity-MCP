@@ -27,17 +27,18 @@ namespace DemoModeA
         private void Awake()
         {
             _profileRepository = _profileRepositorySource as IEmotionProfileRepository;
-            initEmotionChangeListeners();
-
+            
             if (_enableLogs)
             {
                 Debug.Log($"[{nameof(EmotionController)}] Awake. InitialEmotion={_initialEmotion}, MemoryMinutes={_memoryMinutes}, Repo={(_profileRepository != null ? _profileRepository.GetType().Name : "null")}", this);
                 if (_profileRepository == null)
                 {
-                    Debug.LogWarning($"[{nameof(EmotionController)}] No IEmotionProfileRepository found. EmotionProfile will be null in broadcasts.", this);
+                    Debug.LogError($"[{nameof(EmotionController)}] No IEmotionProfileRepository found. Please assign ProfileRepositorySource.", this);
                 }
                 Debug.Log($"[{nameof(EmotionController)}] EmotionChangeListeners={(_emotionChangeListener != null ? _emotionChangeListener.Length : 0)}", this);
             }
+
+            initEmotionChangeListeners();
 
             _currentEmotion = _initialEmotion;
             refreshExpire();

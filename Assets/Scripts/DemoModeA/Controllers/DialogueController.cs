@@ -1,5 +1,6 @@
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DemoModeA
@@ -8,6 +9,20 @@ namespace DemoModeA
     {
         [SerializeField] private float _randomExtendChanceMin = 0.1f;
         [SerializeField] private float _randomExtendChanceMax = 0.2f;
+        private static readonly IReadOnlyDictionary<string, string> EmojiTokenMap = new Dictionary<string, string>
+        {
+            { "🙂", "[Happy]" },
+            { "😉", "[Wink]" },
+            { "😊", "[Happy]" },
+            { "✨", "[Sparkle]" },
+            { "🎉", "[Celebrate]" },
+            { "🥳", "[Celebrate]" },
+            { "🚀", "[Rocket]" },
+            { "😪", "[Sleepy]" },
+            { "😴", "[Sleepy]" },
+            { "😒", "[Annoyed]" },
+            { "🙄", "[EyeRoll]" },
+        };
 
         public string GenerateReply(string userInput, EmotionProfile profile)
         {
@@ -30,40 +45,40 @@ namespace DemoModeA
             switch (profile.AttentionMode)
             {
                 case AttentionMode.Reject:
-                    builder.Append("不了");
+                    builder.Append("No.");
                     return builder.ToString();
                 case AttentionMode.Random:
                     var r = Random.value;
                     var p = Mathf.Lerp(_randomExtendChanceMin, _randomExtendChanceMax, Random.value);
                     if (r < p)
                     {
-                        builder.Append("顺带说，");
+                        builder.Append("By the way, ");
                     }
                     break;
             }
             switch (profile.AffirmationBias)
             {
                 case AffirmationBias.Positive:
-                    builder.Append("好的");
+                    builder.Append("Okay");
                     break;
                 case AffirmationBias.Neutral:
-                    builder.Append("明白");
+                    builder.Append("Got it");
                     break;
                 case AffirmationBias.Negative:
-                    builder.Append("嗯");
+                    builder.Append("Hmm");
                     break;
             }
             if (profile.TextLengthBias == TextLengthBias.Short)
             {
-                builder.Append("。");
+                builder.Append(".");
             }
             else if (profile.TextLengthBias == TextLengthBias.Medium)
             {
-                builder.Append("，我来试试。");
+                builder.Append(", let me try.");
             }
             else
             {
-                builder.Append("，我来详细说说看，你也可以继续补充。");
+                builder.Append(", let me explain in more detail—you can add more context too.");
             }
             return builder.ToString();
         }
@@ -74,12 +89,12 @@ namespace DemoModeA
             switch (style)
             {
                 case PunctuationStyle.Minimal:
-                    return input.Replace("！", "").Replace("。", "");
+                    return input.Replace("!", "").Replace(".", "");
                 case PunctuationStyle.Exclamatory:
-                    if (!input.EndsWith("！")) return input.TrimEnd('。') + "！";
+                    if (!input.EndsWith("!")) return input.TrimEnd('.') + "!";
                     return input;
                 case PunctuationStyle.EllipsisHeavy:
-                    return input.TrimEnd('。') + "…";
+                    return input.TrimEnd('.') + "...";
                 default:
                     return input;
             }
@@ -91,7 +106,16 @@ namespace DemoModeA
             if (profile.EmojiDensity <= 0f) return input;
             if (Random.value > profile.EmojiDensity) return input;
             var idx = Mathf.FloorToInt(Random.value * profile.EmojiPool.Length) % profile.EmojiPool.Length;
-            return input + " " + profile.EmojiPool[idx];
+            return input + " " + toEmojiToken(profile.EmojiPool[idx]);
+        }
+
+        private static string toEmojiToken(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token)) return "";
+            token = token.Trim();
+            if (token.Length >= 2 && token[0] == '[' && token[token.Length - 1] == ']') return token;
+            if (EmojiTokenMap.TryGetValue(token, out var mapped)) return mapped;
+            return token;
         }
     }
 }
