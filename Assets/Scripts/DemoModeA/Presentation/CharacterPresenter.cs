@@ -24,5 +24,5 @@ namespace DemoModeA
             _animator.SetFloat(_animSpeedParam, profile.AnimSpeed);
             _animator.SetInteger(_poseIdParam, profile.PoseId);
         }
-    }
+    } 
 }
